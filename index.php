@@ -1,45 +1,56 @@
+<?php
+require 'database/config.php';
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style_1.css" />
-  <title>Home</title>
-  <link rel="icon" href="images/logo.webp" type="image/x-icon">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="asset/css/index.css" />
+  <link rel="icon" href="asset/images/logo.webp" type="image/x-icon">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Baskervville+SC&family=Nerko+One&family=New+Amsterdam&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200&family=Oswald:wght@200..700&family=Poppins:wght@100;200;300;400;600;700&family=Roboto+Condensed:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <title>CompassED LMS</title>
 </head>
-
 <body>
   <nav class="navbar">
+    <!-- LOGO -->
     <div class="logo">
-      <a href="mainpage_compassED.php"><img src="./images/logo.webp" alt=""></a>
+      <a href="index.php"><img src="asset/images/logo.webp" alt=""></a>
     </div>
+
+    <!-- NAVIGATION MENU -->
     <ul class="nav-links">
+
+      <!-- USING CHECKBOX HACK -->
       <input type="checkbox" id="checkbox_toggle" />
       <label for="checkbox_toggle" class="hamburger">&#9776;</label>
+
+      <!-- NAVIGATION MENUS -->
       <div class="menu">
-        <li><a href="#">Home</a></l>
-        <li><a href="login.php">Login</a></li>
-        <li><a href="about.php">About</a></li>
-         <!--<li><a href="admin-login.php">Admin</a> -->
-          <!-- DROPDOWN MENU -->
-          <!--<ul class="dropdown">
-            <li><a href="aboutus_compassED.php#Mission">Mission </a></li>
-            <li><a href="aboutus_compassED.php#Vision">Vision</a></li>
-            <li><a href="aboutus_compassED.php#Values">Core Values</a></li>
-            <li><a href="aboutus_compassED.php#Institution">Institution</a></li>
-          </ul>-->
-        <!--<li><a href="teacher-login.php">Teacher</a></li>-->
-        <!--<li><a href="user-login.php">User Login</a></li>-->
+
+        <li>
+          <a href="index.php">Home</a>
+        </li>
+		
+        <li class="about">
+          <a href="about.php">About</a>
+        </li>
+
+        <li>
+          <a href="login.php">Login</a>
+        </li>
+
       </div>
     </ul>
   </nav>
 
+<!-- Landing Page -->
 <section class="header">
 
 <div class="text-box">
@@ -49,6 +60,8 @@
 </div>
 
 </section>
+
+<!-- offers -->
 
 <section class="offers">
   <h1>What We Offer</h1>
@@ -70,6 +83,7 @@
  </div>
 </section>
 
+<!-- Contact US -->
 <section class="cta" id="cta">
   <h1>Enroll For Our Specialized Teaching for Students with Disabilities</h1>
   <div class="row">
@@ -100,19 +114,20 @@
     </div>
 
     <div class="cta-cols">
-    <form action="enroll-now-backend.php" method="POST">
-          <input type="text" name="first_name" placeholder="Enter your first name" required>
-          <input type="text" name="last_name" placeholder="Enter your last name" required>
-          <input type="email" name="email" placeholder="Enter your email address" required>
-          <input type="text" name="parent_name" placeholder="Enter parent's name" required>
-          <input type="text" name="parent_email" placeholder="Enter parent's email" required>
-          <input type="text" name="parent_contact" placeholder="Enter parent's contact number" required>
-          <button type="submit" class="contact-us">Enroll Now</button>
-    </form>
+
+      <form action="email.php" method="POST">
+        <input type="text" name="name" placeholder="Enter your name" required>
+        <input type="Email" name="email" placeholder="Enter email address" required>
+        <input type="text" name="subject" placeholder="Enter your subject" required>
+        <textarea rows="8" name="message" placeholder="Message" required></textarea>
+        <button type="submit" class="contact-us">Send Message</button>
+      </form>
     </div>
 
   </div>
 </section>
+
+<!-- location map -->
 
 <section class="location">
 
@@ -140,41 +155,4 @@
 </section>
 
 </body>
-
-<script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const status = urlParams.get('status');
-            if (status) {
-              let message = '';
-              let icon = '';
-              let title = 'Enrollment Status'; // Default title for enrollment-related messages
-
-              switch (status) {
-                  case 'success':
-                      message = 'Your enrollment has been successfully completed.';
-                      icon = 'success';
-                      title = 'Enrollment Successful'; // Title for successful enrollment
-                      break;
-                  case 'duplicate':
-                      message = 'A record with the same email or parent email already exists.';
-                      icon = 'error';
-                      title = 'Duplicate Enrollment'; // Title for duplicate record
-                      break;
-                  case 'error':
-                      message = 'An error occurred. Please try again.';
-                      icon = 'error';
-                      title = 'Enrollment Error'; // Title for general error
-                      break;
-              }
-
-              Swal.fire({
-                  icon: icon,
-                  title: title,
-                  text: message,
-                  confirmButtonText: 'Okay'
-              });
-          }
-        });
-    </script>
 </html>
