@@ -3,15 +3,19 @@ include "database/database.php";
 require 'database/config.php';
 ?>
 
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="asset/css/login.css" />
-  <title>login</title>
-  <link rel="icon" href="asset/images/logo.webp" type="image/x-icon">
-</head>
+  <link rel="icon" href="images/logo.webp" type="image/x-icon">
+  <title>Login</title>
+  <style>
 
+  </style>
+</head>
 <body>
 <nav class="navbar">
     <!-- LOGO -->
@@ -36,7 +40,7 @@ require 'database/config.php';
     </ul>
   </nav>
 
-<div class="container">
+  <div class="container">
     <div class="box">
       <div class="logoform">
         <img src="asset/images/logo.webp" alt="">
@@ -44,12 +48,11 @@ require 'database/config.php';
     </div>
     <div class="box">
       <h2>LOGIN</h2>
-      
-      <form action="" method="post">
+      <form action="login_compassED.php" method="post">
         <input type="text" name="email" placeholder="Email" required><br>
         <input type="password" name="password" placeholder="Password" required><br>
         <div class="forgot-pass">
-          <a href="" style="text-decoration: none">Forgot Password?</a><br>
+          <a href="forgot-password.php" style="text-decoration: none">Forgot Password?</a><br>
         </div>
         <input type="submit" name="submit" value="Login">
       </form>
@@ -58,95 +61,6 @@ require 'database/config.php';
       </div>
     </div>
   </div>
-
-
-  <!-- Background Overlay -->
-  <div id="popup-overlay" class="popup-overlay"></div>
-
-  <!-- Pop-Up Dialog -->
-  <div id="popup" class="popup">
-    <h2>Login Failed</h2>
-    <span id="popup-message"></span>
-    <div>
-    <button id="close-btn">Close</button>
-    </div>
-  </div>
-
-  <script>
-    // Function to show the popup with a specific message
-function showPopup(message) {
-    const popup = document.getElementById('popup');
-    const overlay = document.getElementById('popup-overlay');
-    const popupMessage = document.getElementById('popup-message');
-    popupMessage.innerHTML = message;
-    overlay.classList.add('show');
-    popup.classList.add('show');
-    overlay.style.display = 'block';
-    popup.style.display = 'block';
-    setTimeout(() => {
-        overlay.style.opacity = '1';
-        popup.style.opacity = '1';
-    }, 10); // Small delay to ensure the display property takes effect before opacity transition
-}
-
-// Function to close the popup
-function closePopup() {
-    const popup = document.getElementById('popup');
-    const overlay = document.getElementById('popup-overlay');
-    popup.classList.remove('show');
-    overlay.classList.remove('show');
-    setTimeout(() => {
-        popup.style.display = 'none';
-        overlay.style.display = 'none';
-    }, 10); // Match the transition duration in CSS
-}
-
-// Event listener for the close button
-document.getElementById('close-btn').addEventListener('click', closePopup);
-
-// Event listener for the overlay
-document.getElementById('popup-overlay').addEventListener('click', closePopup);
-  </script>
-
-<?php 
-  if(isset($_POST["submit"])){
-    $useremail = $_POST["email"];
-    $password = $_POST["password"];
-    $sql = "SELECT * FROM users WHERE Email = '$useremail'";
-    $result = $conn->query($sql);
-
-    if($result->num_rows == 1){
-      $user = $result->fetch_assoc();
-      if($password == $user["Password"]){
-        if($user['activation_token'] == NULL){
-          if($user['activated'] == 1){
-            if($user['Status'] == 'Teacher'){
-              $_SESSION["login"] = true;
-              $_SESSION["user"] = $user;
-              header("Location: dashboard_compassED.php");
-            } elseif($user['Status'] == 'Admin'){
-              $_SESSION["login"] = true;
-              $_SESSION["user"] = $user;
-              header("Location: admin/account-approval.php");
-            } elseif($user['Status'] == 'Parent'){
-              $_SESSION["login"] = true;
-              $_SESSION["user"] = $user;
-              header("Location: parents/dashboard.php");
-            }
-          } else {
-            echo "<script>showPopup('Account is not approved yet, please wait or contact the admin for account approval.');</script>";
-          }
-        } else {
-          echo "<script>showPopup('Account is not activated yet, check your email for the link activation. <br><br> Didn\'t receive an email? <a href=\"resend-activation.php\">Resend</a>.');</script>";
-        }
-      } else {
-        echo "<script>showPopup('Wrong Password.');</script>";
-      }
-    } else {
-      echo "<script>showPopup('Email is not registered.');</script>";
-    }
-  }
-  ?>
 
 </body>
 </html>
