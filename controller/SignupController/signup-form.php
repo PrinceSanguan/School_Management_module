@@ -2,6 +2,9 @@
 include "../../database/database.php";
 require "../../database/config.php";
 
+// Start the session
+session_start();
+
 if (isset($_POST['submit'])) {
     // Get and sanitize input
     $firstname = htmlspecialchars($_POST['firstName']);
@@ -13,7 +16,8 @@ if (isset($_POST['submit'])) {
     
     // Validate passwords match
     if ($password !== $cpassword) {
-        echo "Passwords do not match.";
+        $_SESSION['error'] = 'Your passwords do not match.';
+        header("Location: /school-management/signup.php");
         exit();
     }
 
@@ -29,11 +33,13 @@ if (isset($_POST['submit'])) {
 
     // Execute the statement
     if ($stmt->execute()) {
-        // Redirect to the login page if successful
+        $_SESSION['success'] = 'Registration successful! Please wait for your account activation.';
         header("Location: /school-management/login.php");
         exit();
     } else {
-        echo "Error: " . $stmt->error;
+        $_SESSION['error'] = 'An error occurred: ' . $stmt->error;
+        header("Location: /school-management/signup.php");
+        exit();
     }
 
     // Close the statement and connection

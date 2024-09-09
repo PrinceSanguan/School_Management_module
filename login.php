@@ -62,5 +62,34 @@ require 'database/config.php';
     </div>
   </div>
 
+<!---- Sweet Alert ---->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+      // Check for success message
+      <?php if (isset($_SESSION['success'])): ?>
+          Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: '<?php echo $_SESSION['success']; ?>',
+              confirmButtonText: 'OK'
+          });
+          <?php unset($_SESSION['success']); // Clear the session variable ?>
+      <?php endif; ?>
+
+      // Check for error message
+      <?php if (isset($_SESSION['error'])): ?>
+          Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: '<?php echo $_SESSION['error']; ?>',
+              confirmButtonText: 'Try Again'
+          });
+          <?php unset($_SESSION['error']); // Clear the session variable ?>
+      <?php endif; ?>
+  });
+</script>
+
 </body>
 </html>
