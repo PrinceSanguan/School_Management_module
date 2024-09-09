@@ -8,6 +8,13 @@ CREATE TABLE users (
     userRole ENUM('admin', 'teacher', 'student') NOT NULL
 );
 
+CREATE TABLE studentLrn (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    lrn VARCHAR(20) UNIQUE NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 
 INSERT INTO users (firstName, lastName, email, phone, password, userRole)
 VALUES ('admin', 'admin', 'admin@gmail.com', '09123456789', '$2y$12$8qGbpTMe/NFXUMNZbMB5Gu0SFlp/hOcbGb6yyhSdn6MxedBmK7Eta', 'admin');

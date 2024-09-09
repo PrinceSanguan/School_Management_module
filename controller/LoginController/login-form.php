@@ -32,7 +32,7 @@ if (isset($_POST['submit'])) {
         if (password_verify($password, $hashed_password)) {
             // Redirect based on user role
             if ($role == 'admin') {
-                header("Location: /school-management/admin/dashboard.php");
+                header("Location: /school-management/admin/account-approval.php");
                 exit;
             } elseif ($role == 'student') {
                 header("Location: /school-management/student/dashboard.php");

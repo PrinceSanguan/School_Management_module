@@ -10,13 +10,11 @@ $password = ""; // By default, XAMPP or WAMP setups don't use a password for roo
 $dbase = "school_db"; // Replace with your local database name
 
 
-$conn = new mysqli($servername,$username,$password,$dbase);
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbase);
 
-if ($conn->connect_error){
-	echo "Error";
-}else {
-	echo "";
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
-
-
 ?>
