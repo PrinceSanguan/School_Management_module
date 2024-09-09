@@ -1,3 +1,9 @@
-<?php 
+<?php
 session_start();
-$conn = mysqli_connect("localhost", "root", "", "school_db");
+
+// Database connection parameters
+define('DB_SERVER', 'localhost');
+define('DB_USERNAME', 'root');
+define('DB_PASSWORD', '');
+define('DB_DATABASE', 'school_db');
+?>

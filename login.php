@@ -48,7 +48,8 @@ require 'database/config.php';
     </div>
     <div class="box">
       <h2>LOGIN</h2>
-      <form action="login_compassED.php" method="post">
+
+      <form action="controller/LoginController/login-form.php" method="post">
         <input type="text" name="email" placeholder="Email" required><br>
         <input type="password" name="password" placeholder="Password" required><br>
         <div class="forgot-pass">
@@ -56,9 +57,7 @@ require 'database/config.php';
         </div>
         <input type="submit" name="submit" value="Login">
       </form>
-      <div class="bottom-links">
-        <p>Don't have an account yet?</p><a href="signup.php" style="text-decoration: none">Sign Up</a>
-      </div>
+
     </div>
   </div>
 
