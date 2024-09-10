@@ -65,11 +65,12 @@ $conn->close();
   <title>Accounts</title>
 </head>
 <body>
+
   <div class="navbar">
-    <a href="#">Accounts</a>
-    <a href="#">Modules</a>
+    <a href="../admin/account-approval.php">Accounts</a>
+    <a href="../admin/section.php">Section</a>
     <a href="#">Settings</a>
-    <a href="#">Logout</a>
+    <a href="../controller/LogoutController/logOut.php">Logout</a>
   </div>
 
   <div class="container">
@@ -96,7 +97,7 @@ $conn->close();
 
           <!-- LRN input field, initially hidden -->
           <div id="lrnField">
-            <input type="number" name="lrn" placeholder="Learner Reference Number" required min="0">
+            <input type="number" name="lrn" placeholder="Learner Reference Number" min="0">
           </div>
 
           <button type="submit">Add Account</button>

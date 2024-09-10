@@ -18,3 +18,22 @@ CREATE TABLE studentLrn (
 
 INSERT INTO users (firstName, lastName, email, phone, password, userRole)
 VALUES ('admin', 'admin', 'admin@gmail.com', '09123456789', '$2y$12$8qGbpTMe/NFXUMNZbMB5Gu0SFlp/hOcbGb6yyhSdn6MxedBmK7Eta', 'admin');
+
+CREATE TABLE section (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    section VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE subject (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    section_id INT,
+    subject VARCHAR(255) NOT NULL,
+    FOREIGN KEY (section_id) REFERENCES section(id) ON DELETE CASCADE
+);
+
+CREATE TABLE module (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    subject_id INT,
+    module VARCHAR(255) NOT NULL,
+    FOREIGN KEY (subject_id) REFERENCES subject(id) ON DELETE CASCADE
+);
