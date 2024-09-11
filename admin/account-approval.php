@@ -1,5 +1,6 @@
 <?php
-include "../database/database.php";
+include "../../database/database.php";
+require "../../database/config.php";
 
 session_start();
 

@@ -31,9 +31,10 @@ CREATE TABLE subject (
     FOREIGN KEY (section_id) REFERENCES section(id) ON DELETE CASCADE
 );
 
-CREATE TABLE module (
+CREATE TABLE subject_images (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    subject_id INT,
-    module VARCHAR(255) NOT NULL,
+    subject_id INT NOT NULL,
+    week ENUM('week 1', 'week 2', 'week 3', 'week 4') NOT NULL,
+    image_url VARCHAR(255) NOT NULL,  -- This will store the path to the image file
     FOREIGN KEY (subject_id) REFERENCES subject(id) ON DELETE CASCADE
 );

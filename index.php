@@ -1,9 +1,6 @@
 <?php
 require 'database/config.php';
 
-
-// Start the session
-session_start();
 ?>
 
 

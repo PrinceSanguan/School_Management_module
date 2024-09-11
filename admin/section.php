@@ -104,10 +104,28 @@ if (!$result) {
                 <tr>
                     <td><?php echo htmlspecialchars($row['section']); ?></td>
                     <td>
-                       <!-- Button to open the modal -->
-                        <button id="openSubjectBtn" data-section-id="<?php echo $row['id']; ?>">Add Subject</button>
-                        <button onclick="location.href='view_section.php?section_id=<?php echo $row['id']; ?>'">View</button>
-                        <button onclick="location.href='../controller/AdminController/delete-section.php?section_id=<?php echo $row['id']; ?>'">Delete</button>
+                        <!-- Button to open the modal -->
+                        <button 
+                            id="openSubjectBtn" 
+                            data-section-id="<?php echo $row['id']; ?>"
+                            style="background-color: #4CAF50; color: white; border: none; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 4px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);"
+                        >
+                            Add Subject
+                        </button>
+
+                        <button 
+                            onclick="location.href='../controller/AdminController/view-subject.php?section_id=<?php echo $row['id']; ?>'"
+                            style="background-color: #2196F3; color: white; border: none; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 4px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);"
+                        >
+                            View
+                        </button>
+
+                        <button 
+                            onclick="location.href='../controller/AdminController/delete-section.php?section_id=<?php echo $row['id']; ?>'"
+                            style="background-color: #f44336; color: white; border: none; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 4px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);"
+                        >
+                            Delete
+                        </button>
                     </td>
                 </tr>
             <?php endwhile; ?>
@@ -150,68 +168,44 @@ if (!$result) {
   <!-- Add Subject Modal -->
 
 
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Open Add Section Modal
+    document.getElementById('openModal').addEventListener('click', () => {
+        document.getElementById('accountModal').style.display = 'block';
+    });
 
-    <script>
-      // Get the modal
-      var modal = document.getElementById("accountModal");
+    // Open Add Subject Modal
+    document.querySelectorAll('#openSubjectBtn').forEach(button => {
+        button.addEventListener('click', (event) => {
+            // Set section ID in the hidden input
+            document.getElementById('sectionIdInput').value = event.target.getAttribute('data-section-id');
+            document.getElementById('addSubjectModal').style.display = 'block';
+        });
+    });
 
-      // Get the button that opens the modal
-      var openModalButton = document.getElementById("openModal");
+    // Close Modals
+    function closeModals() {
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.style.display = 'none';
+        });
+    }
 
-      // Get the <span> element that closes the modal
-      var closeModalButton = document.getElementById("closeModal");
+    // Close buttons for modals
+    document.querySelectorAll('.modal-close').forEach(button => {
+        button.addEventListener('click', closeModals);
+    });
 
-      // When the user clicks the button, open the modal 
-      openModalButton.onclick = function() {
-          modal.style.display = "block";
-      }
-
-      // When the user clicks on <span> (x), close the modal
-      closeModalButton.onclick = function() {
-          modal.style.display = "none";
-      }
-
-      // When the user clicks anywhere outside of the modal, close it
-      window.onclick = function(event) {
-          if (event.target == modal) {
-              modal.style.display = "none";
-          }
-      }
-    </script>
-
-    <script>
-      // Get modal elements
-var modal = document.getElementById("addSubjectModal");
-var closeModalButton = document.getElementById("closeModal");
-var openSubjectButtons = document.querySelectorAll("#openSubjectBtn");
-var sectionIdInput = document.getElementById("sectionIdInput");
-
-// Function to open the modal and set the section_id
-function openModal(sectionId) {
-    sectionIdInput.value = sectionId;
-    modal.style.display = "block";
-}
-
-// Attach event listeners to open subject buttons
-openSubjectButtons.forEach(button => {
-    button.addEventListener("click", function() {
-        var sectionId = this.getAttribute("data-section-id");
-        openModal(sectionId);
+    // Close modal when clicking outside of modal content
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                closeModals();
+            }
+        });
     });
 });
-
-// When the user clicks on <span> (x), close the modal
-closeModalButton.onclick = function() {
-    modal.style.display = "none";
-}
-
-// When the user clicks anywhere outside of the modal, close it
-window.onclick = function(event) {
-    if (event.target === modal) {
-        modal.style.display = "none";
-    }
-}
-    </script>
+</script>
 
 <script>
       document.addEventListener('DOMContentLoaded', function () {
