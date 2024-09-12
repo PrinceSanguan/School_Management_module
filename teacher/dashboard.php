@@ -1,1 +1,1 @@
-<h1>This is teacher</h1>
+<h1>This is teacher dashboards</h1>

@@ -1,6 +1,5 @@
 <?php
-include "../../database/database.php";
-require "../../database/config.php";
+include "../database/database.php";
 
 session_start();
 
@@ -17,7 +16,7 @@ if (isset($_GET['delete'])) {
     
     if ($stmt->execute()) {
       $_SESSION['success'] = 'The account is already deleted!';
-      header("Location: /school-management/admin/account-approval.php");
+      header("Location: ../admin/account-approval.php");
       exit(); // Redirect to the page displaying the table
     } else {
         echo "Error deleting record: " . $conn->error;

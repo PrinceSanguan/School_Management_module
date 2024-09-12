@@ -10,6 +10,6 @@ session_destroy();
 
 // Redirect to index.php
 $_SESSION['success'] = 'Succesfully Logout.';
-  header("Location: /school-management/login.php");
+  header("Location: ../../login.php");
   exit();
 ?>

@@ -32,13 +32,13 @@ if (isset($_POST['submit'])) {
         if (password_verify($password, $hashed_password)) {
             // Redirect based on user role
             if ($role == 'admin') {
-                header("Location: /school-management/admin/account-approval.php");
+                header("Location: ../../admin/account-approval.php");
                 exit;
             } elseif ($role == 'student') {
-                header("Location: /school-management/student/dashboard.php");
+                header("Location: ../../student/dashboard.php");
                 exit;
             } elseif ($role == 'teacher') {
-                header("Location: /school-management/teacher/dashboard.php");
+                header("Location: ../../teacher/dashboard.php");
                 exit;
             } else {
                 echo "Invalid user role!";

@@ -15,7 +15,7 @@ $lrn = isset($_POST['lrn']) ? $_POST['lrn'] : null;
 // Validate required fields
 if (empty($firstName) || empty($lastName) || empty($email) || empty($phone) || empty($userRole)) {
     $_SESSION['error'] = 'All fields are required.';
-    header("Location: /school-management/admin/account-approval.php");
+    header("Location: ../../admin/account-approval.php");
     exit();
 }
 
@@ -34,7 +34,7 @@ if ($emailCheckStmt->num_rows > 0) {
     $_SESSION['error'] = 'The email address is already taken.';
     $emailCheckStmt->close();
     $conn->close();
-    header("Location: /school-management/admin/account-approval.php");
+    header("Location: ../../admin/account-approval.php");
     exit();
 }
 
@@ -45,7 +45,7 @@ $stmt = $conn->prepare($query);
 if (!$stmt) {
     $_SESSION['error'] = 'Failed to prepare statement: ' . $conn->error;
     $conn->close();
-    header("Location: /school-management/admin/account-approval.php");
+    header("Location: ../../admin/account-approval.php");
     exit();
 }
 
@@ -61,7 +61,7 @@ if ($stmt->execute()) {
         if (!$lrnStmt) {
             $_SESSION['error'] = 'Failed to prepare LRN statement: ' . $conn->error;
             $conn->close();
-            header("Location: /school-management/admin/account-approval.php");
+            header("Location: ../../admin/account-approval.php");
             exit();
         }
         $lrnStmt->bind_param("is", $userId, $lrn);
@@ -70,13 +70,13 @@ if ($stmt->execute()) {
     }
 
     $_SESSION['success'] = 'Registration successful!';
-    header("Location: /school-management/admin/account-approval.php");
+    header("Location: ../../admin/account-approval.php");
     exit();
 } else {
     $_SESSION['error'] = 'Failed to create User: ' . $stmt->error;
     $stmt->close();
     $conn->close();
-    header("Location: /school-management/admin/account-approval.php");
+    header("Location: ../../admin/account-approval.php");
     exit();
 }
 

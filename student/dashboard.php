@@ -1,1 +1,1 @@
-<h1>This is the Student</h1>
+<h1>This is the Student Dashboard</h1>
