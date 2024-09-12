@@ -3,6 +3,13 @@ include "../database/database.php";
 
 session_start();
 
+// Check if the user is an admin
+if (!isset($_SESSION['userRole']) || $_SESSION['userRole'] !== 'admin') {
+    $_SESSION['error'] = "You do not have permission to access this page!.";
+    header("Location: ../index.php");
+    exit();
+}
+
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }

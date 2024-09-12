@@ -3,6 +3,13 @@ include "../database/database.php";
 
 session_start();
 
+// Check if the user is an admin
+if (!isset($_SESSION['userRole']) || $_SESSION['userRole'] !== 'admin') {
+  $_SESSION['error'] = "You do not have permission to access this page!.";
+  header("Location: ../index.php");
+  exit();
+}
+
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
@@ -15,18 +22,21 @@ if (isset($_GET['delete'])) {
     $stmt->bind_param("i", $userId);
     
     if ($stmt->execute()) {
-      $_SESSION['success'] = 'The account is already deleted!';
-      header("Location: ../admin/account-approval.php");
-      exit(); // Redirect to the page displaying the table
+        $_SESSION['success'] = 'The account is already deleted!';
+        header("Location: ../admin/account-approval.php");
+        exit(); // Redirect to the page displaying the table
     } else {
         echo "Error deleting record: " . $conn->error;
     }
 }
 
-// Query to get user information
+// Query to get user information including additional fields from studentLrn
 $query = "
     SELECT u.id, u.userRole, CONCAT(u.firstName, ' ', u.lastName) AS fullName, 
-           COALESCE(s.lrn, 'NO LRN Number') AS lrn, u.phone, u.email
+           COALESCE(s.lrn, 'N/A') AS lrn, u.phone, u.email,
+           COALESCE(s.parent, 'N/A') AS parent, 
+           COALESCE(s.address, 'N/A') AS address, 
+           COALESCE(s.number, 'N/A') AS number
     FROM users u
     LEFT JOIN studentLrn s ON u.id = s.user_id
 ";
@@ -38,9 +48,12 @@ if ($result->num_rows > 0) {
         $tableRows .= '<tr>
             <td>' . htmlspecialchars($row['userRole']) . '</td>
             <td>' . htmlspecialchars($row['fullName']) . '</td>
-            <td>' . htmlspecialchars($row['lrn']) . '</td>
             <td>' . htmlspecialchars($row['phone']) . '</td>
             <td>' . htmlspecialchars($row['email']) . '</td>
+            <td>' . htmlspecialchars($row['lrn']) . '</td>
+            <td>' . htmlspecialchars($row['parent']) . '</td>
+            <td>' . htmlspecialchars($row['address']) . '</td>
+            <td>' . htmlspecialchars($row['number']) . '</td>
             <td>
                 <a href="edit-account.php?id=' . htmlspecialchars($row['id']) . '"><button class="button">Edit</button></a>
                 <a href="?delete=' . htmlspecialchars($row['id']) . '" onclick="return confirm(\'Are you sure you want to delete this user?\');"><button class="button">Delete</button></a>
@@ -48,7 +61,7 @@ if ($result->num_rows > 0) {
         </tr>';
     }
 } else {
-    $tableRows = '<tr><td colspan="6">No records found.</td></tr>';
+    $tableRows = '<tr><td colspan="9">No records found.</td></tr>';
 }
 
 $conn->close();
@@ -98,6 +111,9 @@ $conn->close();
           <!-- LRN input field, initially hidden -->
           <div id="lrnField">
             <input type="number" name="lrn" placeholder="Learner Reference Number" min="0">
+            <input type="text" name="parent" placeholder="Parent Name">
+            <input type="text" name="address" placeholder="Parent Address">
+            <input type="number" name="number" placeholder="Parent Contact Number" min="0">
           </div>
 
           <button type="submit">Add Account</button>
@@ -111,9 +127,12 @@ $conn->close();
         <tr>
           <th>User Role</th>
           <th>Full Name</th>
-          <th>LRN (Only Student)</th>
-          <th>Email</th>
           <th>Phone</th>
+          <th>Email</th>
+          <th>LRN (Only Student)</th>
+          <th>Parent (Only Student)</th>
+          <th>Address (Only Student)</th>
+          <th>Emergency Contact (Only Student)</th>
           <th>Action</th>
         </tr>
       </thead>

@@ -12,6 +12,9 @@ CREATE TABLE studentLrn (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     lrn VARCHAR(20) UNIQUE NOT NULL,
+    parent VARCHAR(50) NOT NULL,
+    address VARCHAR(50) NOT NULL,
+    number VARCHAR(50) NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 

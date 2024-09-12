@@ -3,6 +3,13 @@ include "../database/database.php";
 
 session_start();
 
+// Check if the user is an admin
+if (!isset($_SESSION['userRole']) || $_SESSION['userRole'] !== 'admin') {
+    $_SESSION['error'] = "You do not have permission to access this page!.";
+    header("Location: ../index.php");
+    exit();
+}
+
 if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
@@ -10,8 +17,13 @@ if (!$conn) {
 if (isset($_GET['id'])) {
     $userId = intval($_GET['id']);
     
-    // Fetch user details and role
-    $query = "SELECT u.*, s.lrn FROM users u LEFT JOIN studentLrn s ON u.id = s.user_id WHERE u.id = ?";
+    // Fetch user details and role, including additional fields from studentLrn
+    $query = "
+        SELECT u.*, s.lrn, s.parent, s.address, s.number 
+        FROM users u 
+        LEFT JOIN studentLrn s ON u.id = s.user_id 
+        WHERE u.id = ?
+    ";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $userId);
     $stmt->execute();
@@ -29,6 +41,9 @@ if (isset($_GET['id'])) {
         $phone = $_POST['phone'];
         $email = $_POST['email'];
         $lrn = isset($_POST['lrn']) ? $_POST['lrn'] : null;
+        $parent = isset($_POST['parent']) ? $_POST['parent'] : null;
+        $address = isset($_POST['address']) ? $_POST['address'] : null;
+        $number = isset($_POST['number']) ? $_POST['number'] : null;
         
         // Update user details
         $updateQuery = "UPDATE users SET firstName = ?, lastName = ?, phone = ?, email = ? WHERE id = ?";
@@ -36,18 +51,19 @@ if (isset($_GET['id'])) {
         $updateStmt->bind_param("ssssi", $firstName, $lastName, $phone, $email, $userId);
         
         if ($updateStmt->execute()) {
-            // If the user is a student, update LRN
+            // If the user is a student, update LRN and additional fields
             if ($user['userRole'] == 'student') {
+                // Update LRN if provided
                 if ($lrn !== null) {
-                    $lrnUpdateQuery = "UPDATE studentLrn SET lrn = ? WHERE user_id = ?";
+                    $lrnUpdateQuery = "UPDATE studentLrn SET lrn = ?, parent = ?, address = ?, number = ? WHERE user_id = ?";
                     $lrnStmt = $conn->prepare($lrnUpdateQuery);
-                    $lrnStmt->bind_param("si", $lrn, $userId);
+                    $lrnStmt->bind_param("ssssi", $lrn, $parent, $address, $number, $userId);
                     $lrnStmt->execute();
                 }
             }
             
             $_SESSION['success'] = 'The account has been updated!';
-            header("Location: /school-management/admin/account-approval.php");
+            header("Location: ../admin/account-approval.php");
             exit();
         } else {
             echo "Error updating record: " . $conn->error;
@@ -180,6 +196,9 @@ body {
         <?php if ($user['userRole'] == 'student'): ?>
             <label>LRN:</label>
             <input type="text" name="lrn" value="<?php echo htmlspecialchars($user['lrn']); ?>"><br>
+            <input type="text" name="parent" value="<?php echo htmlspecialchars($user['parent']); ?>"><br>
+            <input type="text" name="address" value="<?php echo htmlspecialchars($user['address']); ?>"><br>
+            <input type="number" name="number" value="<?php echo htmlspecialchars($user['number']); ?>"><br>
         <?php endif; ?>
         <input type="submit" value="Update">
     </form>

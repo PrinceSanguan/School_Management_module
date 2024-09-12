@@ -1,7 +1,6 @@
 <?php
 include "../../database/database.php";
 require "../../database/config.php";
-session_start(); // Ensure sessions are started
 
 // Get form data
 $firstName = $_POST['firstName'] ?? '';
@@ -11,6 +10,9 @@ $phone = $_POST['phone'] ?? '';
 $userRole = $_POST['userRole'] ?? '';
 $password = $firstName . $lastName; // Concatenate first name and last name
 $lrn = isset($_POST['lrn']) ? $_POST['lrn'] : null;
+$parent = isset($_POST['parent']) ? $_POST['parent'] : null;
+$address = isset($_POST['address']) ? $_POST['address'] : null;
+$number = isset($_POST['number']) ? $_POST['number'] : null;
 
 // Validate required fields
 if (empty($firstName) || empty($lastName) || empty($email) || empty($phone) || empty($userRole)) {
@@ -56,7 +58,7 @@ if ($stmt->execute()) {
 
     // If user is a student, insert LRN into studentLrn table
     if ($userRole === 'student' && !empty($lrn)) {
-        $lrnQuery = "INSERT INTO studentLrn (user_id, lrn) VALUES (?, ?)";
+        $lrnQuery = "INSERT INTO studentLrn (user_id, lrn, parent, address, number) VALUES (?, ?, ?, ?, ?)";
         $lrnStmt = $conn->prepare($lrnQuery);
         if (!$lrnStmt) {
             $_SESSION['error'] = 'Failed to prepare LRN statement: ' . $conn->error;
@@ -64,7 +66,8 @@ if ($stmt->execute()) {
             header("Location: ../../admin/account-approval.php");
             exit();
         }
-        $lrnStmt->bind_param("is", $userId, $lrn);
+        // The type definition string is 'issss' for integer and five strings
+        $lrnStmt->bind_param("issss", $userId, $lrn, $parent, $address, $number);
         $lrnStmt->execute();
         $lrnStmt->close();
     }
