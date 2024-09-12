@@ -9,7 +9,7 @@ $section_id = $_GET['section_id'] ?? '';
 // Validate section ID
 if (empty($section_id) || !is_numeric($section_id)) {
     $_SESSION['error'] = 'Invalid section ID.';
-    header("Location: /school-management/admin/section.php");
+    header("Location: ../../admin/section.php");
     exit();
 }
 
@@ -54,6 +54,6 @@ try {
 $conn->close();
 
 // Redirect to the section page
-header("Location: /school-management/admin/section.php");
+header("Location: ../../admin/section.php");
 exit();
 ?>

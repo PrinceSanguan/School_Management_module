@@ -22,7 +22,7 @@ $result = $conn->query($query);
 if (!$result) {
     $_SESSION['error'] = 'Failed to fetch sections: ' . $conn->error;
     $conn->close();
-    header("Location: /school-management/admin/section.php");
+    header("Location: ../admin/section.php");
     exit();
 }
 
@@ -84,18 +84,19 @@ if (!$result) {
 }
   </style>
 </head>
+
 <body>
-  <div class="navbar">
+   <div class="navbar">
     <a href="../admin/account-approval.php">Accounts</a>
     <a href="../admin/section.php">Section</a>
-    <a href="#">Settings</a>
+    <a href="../admin/announcement.php">Announcement</a>
     <a href="../controller/LogoutController/logOut.php">Logout</a>
   </div>
 
   <div class="container">
 
      <!-- Button to open the modal -->
-     <button class="button" id="openModal">Add Section</button>
+     <button class="button" id="openModal" style="margin-bottom: 10px;">Add Section</button>
 
 
     <!-- Table to display sections -->

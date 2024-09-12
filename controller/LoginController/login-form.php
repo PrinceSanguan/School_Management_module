@@ -2,6 +2,9 @@
 include "../../database/database.php";
 require "../../database/config.php";
 
+// Start the session
+session_start();
+
 if (isset($_POST['submit'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
@@ -27,9 +30,15 @@ if (isset($_POST['submit'])) {
         $user = $result->fetch_assoc();
         $hashed_password = $user['password'];
         $role = $user['userRole'];
+        $userId = $user['id']; // Assuming you might want to store the user ID as well
 
         // Verify the password
         if (password_verify($password, $hashed_password)) {
+            // Set session variables
+            $_SESSION['userRole'] = $role;
+            $_SESSION['userId'] = $userId;
+            $_SESSION['email'] = $email; // Optional: store the email if needed
+
             // Redirect based on user role
             if ($role == 'admin') {
                 header("Location: ../../admin/account-approval.php");

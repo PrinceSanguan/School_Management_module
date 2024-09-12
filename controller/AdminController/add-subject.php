@@ -10,7 +10,7 @@ $subject = $_POST['subject'] ?? '';
 // Validate required fields
 if (empty($section_id) || empty($subject)) {
     $_SESSION['error'] = 'All fields are required.';
-    header("Location: /school-management/admin/section.php");
+    header("Location: ../../admin/section.php");
     exit();
 }
 
@@ -21,7 +21,7 @@ $stmt = $conn->prepare($query);
 if (!$stmt) {
     $_SESSION['error'] = 'Failed to prepare statement: ' . $conn->error;
     $conn->close();
-    header("Location: /school-management/admin/section.php");
+    header("Location: ../../admin/section.php");
     exit();
 }
 
@@ -37,6 +37,6 @@ $stmt->close();
 $conn->close();
 
 // Redirect to the section page or any other page
-header("Location: /school-management/admin/section.php");
+header("Location: ../../admin/section.php");
 exit();
 ?>

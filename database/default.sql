@@ -8,6 +8,13 @@ CREATE TABLE users (
     userRole ENUM('admin', 'teacher', 'student') NOT NULL
 );
 
+CREATE TABLE announcement (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    announcement VARCHAR(255) NOT NULL,
+    view ENUM('student', 'teacher', 'studentTeacher') NOT NULL
+);
+
+
 CREATE TABLE studentLrn (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -37,7 +44,7 @@ CREATE TABLE subject (
 CREATE TABLE subject_images (
     id INT AUTO_INCREMENT PRIMARY KEY,
     subject_id INT NOT NULL,
-    week ENUM('week 1', 'week 2', 'week 3', 'week 4') NOT NULL,
+    week ENUM('week1', 'week2', 'week3', 'week4') NOT NULL,
     image_url VARCHAR(255) NOT NULL,  -- This will store the path to the image file
     FOREIGN KEY (subject_id) REFERENCES subject(id) ON DELETE CASCADE
 );

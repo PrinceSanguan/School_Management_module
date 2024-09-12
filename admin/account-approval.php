@@ -82,7 +82,7 @@ $conn->close();
   <div class="navbar">
     <a href="../admin/account-approval.php">Accounts</a>
     <a href="../admin/section.php">Section</a>
-    <a href="#">Settings</a>
+    <a href="../admin/announcement.php">Announcement</a>
     <a href="../controller/LogoutController/logOut.php">Logout</a>
   </div>
 
