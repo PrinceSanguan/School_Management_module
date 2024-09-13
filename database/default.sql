@@ -41,10 +41,11 @@ CREATE TABLE subject (
     FOREIGN KEY (section_id) REFERENCES section(id) ON DELETE CASCADE
 );
 
-CREATE TABLE subject_images (
+CREATE TABLE teacherSubject (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
     subject_id INT NOT NULL,
-    week ENUM('week1', 'week2', 'week3', 'week4') NOT NULL,
-    image_url VARCHAR(255) NOT NULL,  -- This will store the path to the image file
-    FOREIGN KEY (subject_id) REFERENCES subject(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES subject(id) ON DELETE CASCADE,
 );
+
