@@ -44,6 +44,10 @@ require 'database/config.php';
         </li>
 
         <li>
+          <a href="calendar.php">Calendar</a>
+        </li>
+
+        <li>
           <a href="login.php">Login</a>
         </li>
 

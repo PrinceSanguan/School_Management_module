@@ -35,7 +35,13 @@ require 'database/config.php';
         <li class="about">
           <a href="about.php">About</a>
         </li>
-        <li><a href="login.php">Login</a></li>
+        <li>
+          <a href="calendar.php">Calendar</a>
+        </li>
+
+        <li>
+          <a href="login.php">Login</a>
+        </li>
       </div>
     </ul>
   </nav>

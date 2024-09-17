@@ -1,3 +1,4 @@
+-- Users table: stores information about all types of users (admins, teachers, students)
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     firstName VARCHAR(50) NOT NULL,
@@ -8,13 +9,14 @@ CREATE TABLE users (
     userRole ENUM('admin', 'teacher', 'student') NOT NULL
 );
 
+-- Announcements table: stores announcements that can be viewed by different roles
 CREATE TABLE announcement (
     id INT AUTO_INCREMENT PRIMARY KEY,
     announcement VARCHAR(255) NOT NULL,
     view ENUM('student', 'teacher', 'studentTeacher') NOT NULL
 );
 
-
+-- Student LRN table: stores unique student information
 CREATE TABLE studentLrn (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -25,15 +27,17 @@ CREATE TABLE studentLrn (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
-
+-- Inserting an admin user for system access
 INSERT INTO users (firstName, lastName, email, phone, password, userRole)
 VALUES ('admin', 'admin', 'admin@gmail.com', '09123456789', '$2y$12$8qGbpTMe/NFXUMNZbMB5Gu0SFlp/hOcbGb6yyhSdn6MxedBmK7Eta', 'admin');
 
+-- Section table: stores different sections/classes
 CREATE TABLE section (
     id INT AUTO_INCREMENT PRIMARY KEY,
     section VARCHAR(255) NOT NULL
 );
 
+-- Subject table: stores subjects taught within a section
 CREATE TABLE subject (
     id INT AUTO_INCREMENT PRIMARY KEY,
     section_id INT,
@@ -41,11 +45,27 @@ CREATE TABLE subject (
     FOREIGN KEY (section_id) REFERENCES section(id) ON DELETE CASCADE
 );
 
+-- TeacherSubject table: links teachers to subjects they teach
 CREATE TABLE teacherSubject (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     subject_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (subject_id) REFERENCES subject(id) ON DELETE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES subject(id) ON DELETE CASCADE
 );
 
+-- Events table: stores events with their dates
+CREATE TABLE events (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    date DATE NOT NULL,
+    title VARCHAR(255) NOT NULL
+);
+
+-- New table to link students to sections (one student can only belong to one section)
+CREATE TABLE studentSection (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    section_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (section_id) REFERENCES section(id) ON DELETE CASCADE
+);
