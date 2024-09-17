@@ -146,7 +146,6 @@ body {
     </style>
 </head>
 <body>
-
     <div class="container">
         <div class="calendar-header">
             <button id="prevMonth">&lt;</button>
@@ -158,7 +157,7 @@ body {
             <h2>Add/Edit Event</h2>
             <input type="date" id="eventDate" />
             <input type="text" id="eventTitle" placeholder="Event Title" />
-            <input type="text" id="eventId" />
+            <input type="hidden" id="eventId" />
             <button id="saveEvent">Save Event</button>
             <button id="deleteEvent" class="hidden">Delete Event</button>
         </div>
