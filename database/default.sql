@@ -50,6 +50,7 @@ CREATE TABLE teacherSubject (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     subject_id INT NOT NULL,
+    status ENUM('unpublish', 'publish') DEFAULT 'publish',
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES subject(id) ON DELETE CASCADE
 );

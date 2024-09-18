@@ -53,10 +53,12 @@ if (isset($_POST['submit'])) {
                 echo "Invalid user role!";
             }
         } else {
-            echo "Invalid email or password!";
+            $_SESSION['error'] = 'Invalid Email or Password';
+            header("Location: ../../login.php");
         }
     } else {
-        echo "Invalid email or password!";
+        $_SESSION['error'] = 'Invalid Email or Password';
+        header("Location: ../../login.php");
     }
 
     $stmt->close();
