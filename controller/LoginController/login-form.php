@@ -2,20 +2,9 @@
 include "../../database/database.php";
 require "../../database/config.php";
 
-// Start the session
-session_start();
-
 if (isset($_POST['submit'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
-
-    // Create connection
-    $conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_DATABASE);
-
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
 
     // Query to find the user
     $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
@@ -30,27 +19,38 @@ if (isset($_POST['submit'])) {
         $user = $result->fetch_assoc();
         $hashed_password = $user['password'];
         $role = $user['userRole'];
-        $userId = $user['id']; // Assuming you might want to store the user ID as well
+        $changePassword = $user['changePassword'];  // This will be 'yes' or 'no'
+        $userId = $user['id']; 
 
         // Verify the password
         if (password_verify($password, $hashed_password)) {
             // Set session variables
             $_SESSION['userRole'] = $role;
             $_SESSION['userId'] = $userId;
-            $_SESSION['email'] = $email; // Optional: store the email if needed
+            $_SESSION['email'] = $email; 
+            $_SESSION['changePassword'] = $changePassword; 
 
-            // Redirect based on user role
-            if ($role == 'admin') {
-                header("Location: ../../admin/account-approval.php");
-                exit;
-            } elseif ($role == 'student') {
-                header("Location: ../../student/announcement.php");
-                exit;
-            } elseif ($role == 'teacher') {
-                header("Location: ../../teacher/announcement.php");
-                exit;
-            } else {
-                echo "Invalid user role!";
+            // If password change is required (changePassword is 'no'), redirect to change_password page
+            if ($changePassword === 'no') {
+                $_SESSION['success'] = "Change the password first before you proceed.";
+                header("Location: change_password.php"); // Adjust the path if needed
+                exit();
+            }
+
+            // If the password has been changed (changePassword is 'yes'), redirect to the respective dashboard
+            if ($changePassword === 'yes') {
+                if ($role == 'admin') {
+                    header("Location: ../../admin/account-approval.php");
+                    exit();
+                } elseif ($role == 'student') {
+                    header("Location: ../../student/announcement.php");
+                    exit();
+                } elseif ($role == 'teacher') {
+                    header("Location: ../../teacher/announcement.php");
+                    exit();
+                } else {
+                    echo "Invalid user role!";
+                }
             }
         } else {
             $_SESSION['error'] = 'Invalid Email or Password';

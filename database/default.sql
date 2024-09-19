@@ -6,7 +6,8 @@ CREATE TABLE users (
     email VARCHAR(100) NOT NULL UNIQUE,
     phone VARCHAR(20),
     password VARCHAR(255) NOT NULL,
-    userRole ENUM('admin', 'teacher', 'student') NOT NULL
+    userRole ENUM('admin', 'teacher', 'student') NOT NULL,
+    changePassword ENUM('yes', 'no') DEFAULT 'no'
 );
 
 -- Announcements table: stores announcements that can be viewed by different roles
@@ -28,8 +29,8 @@ CREATE TABLE studentLrn (
 );
 
 -- Inserting an admin user for system access
-INSERT INTO users (firstName, lastName, email, phone, password, userRole)
-VALUES ('admin', 'admin', 'admin@gmail.com', '09123456789', '$2y$12$8qGbpTMe/NFXUMNZbMB5Gu0SFlp/hOcbGb6yyhSdn6MxedBmK7Eta', 'admin');
+INSERT INTO users (firstName, lastName, email, phone, password, userRole, changePassword)
+VALUES ('admin', 'admin', 'admin@gmail.com', '09123456789', '$2y$12$8qGbpTMe/NFXUMNZbMB5Gu0SFlp/hOcbGb6yyhSdn6MxedBmK7Eta', 'admin', 'yes');
 
 -- Section table: stores different sections/classes
 CREATE TABLE section (
@@ -53,7 +54,7 @@ CREATE TABLE subject_images (
     status ENUM('unpublish', 'publish') DEFAULT 'publish',
     image_url VARCHAR(255) NOT NULL,
 
-    FOREIGN KEY (subject_id) REFERENCES subject(id) ON DELETE CASCADE,
+    FOREIGN KEY (subject_id) REFERENCES subject(id) ON DELETE CASCADE
 );
 
 -- TeacherSubject table: links teachers to subjects they teach

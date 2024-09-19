@@ -50,25 +50,30 @@ $query = "
 $result = $conn->query($query);
 
 if ($result->num_rows > 0) {
-    $tableRows = '';
-    while ($row = $result->fetch_assoc()) {
-        $tableRows .= '<tr>
-            <td>' . htmlspecialchars($row['userRole']) . '</td>
-            <td>' . htmlspecialchars($row['fullName']) . '</td>
-            <td>' . htmlspecialchars($row['phone']) . '</td>
-            <td>' . htmlspecialchars($row['email']) . '</td>
-            <td>' . htmlspecialchars($row['lrn']) . '</td>
-            <td>' . htmlspecialchars($row['parent']) . '</td>
-            <td>' . htmlspecialchars($row['address']) . '</td>
-            <td>' . htmlspecialchars($row['number']) . '</td>
-            <td>
-                <a href="edit-account.php?id=' . htmlspecialchars($row['id']) . '"><button class="button">Edit</button></a>
-                <a href="?delete=' . htmlspecialchars($row['id']) . '" onclick="return confirm(\'Are you sure you want to delete this user?\');"><button class="button">Delete</button></a>
-            </td>
-        </tr>';
-    }
+  $tableRows = '';
+  while ($row = $result->fetch_assoc()) {
+      $deleteButton = '';
+      if ($row['userRole'] !== 'admin') {
+          $deleteButton = '<a href="?delete=' . htmlspecialchars($row['id']) . '" onclick="return confirm(\'Are you sure you want to delete this user?\');"><button class="button">Delete</button></a>';
+      }
+
+      $tableRows .= '<tr>
+          <td>' . htmlspecialchars($row['userRole']) . '</td>
+          <td>' . htmlspecialchars($row['fullName']) . '</td>
+          <td>' . htmlspecialchars($row['phone']) . '</td>
+          <td>' . htmlspecialchars($row['email']) . '</td>
+          <td>' . htmlspecialchars($row['lrn']) . '</td>
+          <td>' . htmlspecialchars($row['parent']) . '</td>
+          <td>' . htmlspecialchars($row['address']) . '</td>
+          <td>' . htmlspecialchars($row['number']) . '</td>
+          <td>
+              <a href="edit-account.php?id=' . htmlspecialchars($row['id']) . '"><button class="button">Edit</button></a>
+              ' . $deleteButton . '
+          </td>
+      </tr>';
+  }
 } else {
-    $tableRows = '<tr><td colspan="9">No records found.</td></tr>';
+  $tableRows = '<tr><td colspan="9">No records found.</td></tr>';
 }
 
 $conn->close();
