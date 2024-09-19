@@ -88,6 +88,13 @@ if ($result->num_rows > 0) {
         .carousel-nav button:hover {
             background-color: #00cc00;
         }
+
+        .announcement-date {
+            font-size: 14px;
+            color: #888;
+            text-align: center; /* Center the date */
+            margin-top: 10px; /* Add space between the content and date */
+        }
     </style>
 </head>
 <body>
@@ -98,18 +105,33 @@ if ($result->num_rows > 0) {
     </div>
 
     <div class="carousel-container">
-        <div class="carousel">
-            <?php foreach ($announcements as $index => $announcement): ?>
-                <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?>">
-                    <?php echo htmlspecialchars($announcement['announcement']); ?>
-                </div>
-            <?php endforeach; ?>
-        </div>
-        <div class="carousel-nav">
-            <button id="prevBtn">Previous</button>
-            <button id="nextBtn">Next</button>
-        </div>
+    <div class="carousel">
+        <?php foreach ($announcements as $index => $announcement): ?>
+            <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?>">
+                <?php
+                // Show text if available, otherwise show image
+                if (!empty($announcement['announcement'])) {
+                    echo '<p>' . htmlspecialchars($announcement['announcement']) . '</p>';
+                } elseif (!empty($announcement['image_path'])) {
+                    echo '<img src="../../' . htmlspecialchars($announcement['image_path']) . '" alt="Announcement Image" style="max-width: 300px; max-height: 300px;">';
+                } else {
+                    echo '<p>No content available</p>';
+                }
+
+                // Display the announcement creation date
+                if (!empty($announcement['created_at'])) {
+                    $formattedDate = date('F j, Y', strtotime($announcement['created_at']));
+                    echo '<p class="announcement-date" style="margin-top: 10px;">Posted on: ' . $formattedDate . '</p>';
+                }
+                ?>
+            </div>
+        <?php endforeach; ?>
     </div>
+    <div class="carousel-nav">
+        <button id="prevBtn">Previous</button>
+        <button id="nextBtn">Next</button>
+    </div>
+</div>
 
     <script>
         const carousel = document.querySelector('.carousel');

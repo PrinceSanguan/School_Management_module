@@ -14,7 +14,9 @@ CREATE TABLE users (
 CREATE TABLE announcement (
     id INT AUTO_INCREMENT PRIMARY KEY,
     announcement VARCHAR(255) NOT NULL,
-    view ENUM('student', 'teacher', 'studentTeacher') NOT NULL
+    image_path VARCHAR(255) DEFAULT NULL,
+    view ENUM('student', 'teacher', 'studentTeacher') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Student LRN table: stores unique student information

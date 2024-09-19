@@ -22,7 +22,7 @@ if (!$conn) {
 }
 
 // Fetch data from the database
-$query = "SELECT id, announcement, view FROM announcement";
+$query = "SELECT id, announcement, view, image_path FROM announcement";
 $result = $conn->query($query);
 
 if (!$result) {
@@ -63,17 +63,39 @@ $conn->close();
         <button class="modal-close" id="closeModal">&times;</button>
         <h2>Add Announcement</h2>
 
-        <form id="addAccountForm" method="post" action="../controller/AdminController/add-announcement.php">
+        <!-- Form to add an announcement -->
+        <form id="addAccountForm" method="post" action="../controller/AdminController/add-announcement.php" enctype="multipart/form-data">
+          
+          <!-- Select option to choose what to post -->
+          <label for="postType">What do you want to post?</label>
+          <select name="postType" id="postType">
+            <option value="" disabled selected>Select an option</option>
+            <option value="Image">Image</option>
+            <option value="Text">Text</option>
+          </select>
 
-        <textarea name="announcement" rows="5" cols="65" placeholder="Place your announcement here"></textarea>
+          <!-- Hidden image input field -->
+          <div id="imageUpload" style="display: none;">
+            <label>Upload Image</label>
+            <input type="file" name="image" id="imageFile" accept=".png, .jpg, .jpeg">
+          </div>
 
-        <select name="view" id="view">
-          <option value="" disabled selected>Who can view this?</option>
-          <option value="student">Student</option>
-          <option value="teacher">Teacher</option>
-          <option value="studentTeacher">Teacher and Student</option>
-        </select>
+          <!-- Hidden textarea input field -->
+          <div id="textInput" style="display: none;">
+            <label>Announcement Text</label>
+            <textarea name="announcement" rows="5" cols="65" placeholder="Place your announcement here"></textarea>
+          </div>
 
+          <!-- Select who can view the announcement -->
+          <label for="viewers">Who can view this?</label>
+          <select name="view" id="view">
+            <option value="" disabled selected>Select a viewer</option>
+            <option value="student">Student</option>
+            <option value="teacher">Teacher</option>
+            <option value="studentTeacher">Teacher and Student</option>
+          </select>
+
+          <!-- Submit button -->
           <button type="submit">Add Announcement</button>
         </form>
       </div>
@@ -108,13 +130,27 @@ $conn->close();
                         $viewText = 'Teacher and Student';
                         break;
                 }
-                // Ensure proper escaping for attributes
+
+                // Get announcement and image path
                 $announcement = htmlspecialchars($row['announcement']);
+                $imagePath = htmlspecialchars($row['image_path']);
                 $viewText = htmlspecialchars($viewText);
                 $id = urlencode($row['id']);
+
                 ?>
                 <tr>
-                  <td><?php echo $announcement; ?></td>
+                  <td>
+                    <?php
+                    // Display the announcement text or image based on what exists
+                    if (!empty($announcement)) {
+                        echo $announcement;
+                    } elseif (!empty($imagePath)) {
+                        echo '<img src="../../' . $imagePath . '" alt="Announcement Image" style="max-width: 100px; max-height: 100px;">';
+                    } else {
+                        echo 'No content available';
+                    }
+                    ?>
+                  </td>
                   <td><?php echo $viewText; ?></td>
                   <td>
                     <button 
@@ -140,6 +176,27 @@ $conn->close();
 </table>
   </div>
   
+  <!-- JavaScript to handle showing/hiding fields -->
+<script>
+  document.getElementById('postType').addEventListener('change', function() {
+    var postType = this.value;
+    var imageUpload = document.getElementById('imageUpload');
+    var textInput = document.getElementById('textInput');
+
+    // Hide both initially
+    imageUpload.style.display = 'none';
+    textInput.style.display = 'none';
+
+    // Show image upload if "Image" is selected
+    if (postType === 'Image') {
+      imageUpload.style.display = 'block';
+    }
+    // Show textarea if "Text" is selected
+    else if (postType === 'Text') {
+      textInput.style.display = 'block';
+    }
+  });
+</script>
   
   <script>
     document.getElementById('openModal').addEventListener('click', function() {
