@@ -3,10 +3,17 @@ include "../database/database.php";
 
 session_start();
 
-// Check if the user is an admin
-if (!isset($_SESSION['userRole']) || $_SESSION['userRole'] !== 'admin') {
-  $_SESSION['error'] = "You do not have permission to access this page!.";
-  header("Location: ../index.php");
+// Check if the user is logged in
+if (!isset($_SESSION['userId']) || !isset($_SESSION['userRole'])) {
+  $_SESSION['error'] = "Please log in to access this page.";
+  header("Location: ../../login.php");
+  exit();
+}
+
+// Check if the user is an admin or the verified user
+if ($_SESSION['userRole'] !== 'admin' && $_SESSION['userId'] != $subject['userId']) {
+  $_SESSION['error'] = "You do not have permission to access this page.";
+  header("Location: ../../index.php");
   exit();
 }
 
@@ -40,7 +47,7 @@ $conn->close();
   <div class="navbar">
     <a href="../admin/account-approval.php">Accounts</a>
     <a href="../admin/section.php">Section</a>
-    <a href="../admin/announcement.php">Announcement</a>
+    <a href="../admin/announcement.php" style="color:wheat">Announcement</a>
     <a href="../admin/registration.php">Registration</a>
     <a href="../admin/student-registration.php">Student Registration</a>
     <a href="../admin/calendar.php">Calendar</a>
@@ -72,7 +79,6 @@ $conn->close();
       </div>
     </div>
      <!---------------ADD MODAL---------------------------->
-
      <table>
   <thead>
     <tr>

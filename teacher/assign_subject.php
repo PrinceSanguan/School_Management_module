@@ -1,6 +1,5 @@
 <?php
 include "../database/database.php";
-
 session_start();
 
 // Check if the user is a teacher
@@ -17,51 +16,27 @@ if (!isset($_SESSION['userId'])) {
 
 $userId = $_SESSION['userId']; // Get the user ID from session
 
-// Function to get subjects for a teacher
-function getTeacherSubjects($conn, $userId) {
-    $sql = "SELECT s.id AS subject_id, s.subject, ts.status
-            FROM teacherSubject ts
-            JOIN subject s ON ts.subject_id = s.id
-            WHERE ts.user_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $userId);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    $stmt->close();
-    return $result;
-}
+// Query to get subjects associated with the teacher and their pdf files
+$query = "SELECT subject.subject, subject_images.id, subject_images.week, subject_images.image_url, subject_images.status 
+          FROM teacherSubject
+          JOIN subject ON teacherSubject.subject_id = subject.id
+          JOIN subject_images ON subject.id = subject_images.subject_id
+          WHERE teacherSubject.user_id = ?";
 
-// Function to update subject status
-function updateSubjectStatus($conn, $subjectId, $newStatus) {
-    $updateSql = "UPDATE teacherSubject SET status = ? WHERE subject_id = ?";
-    $updateStmt = $conn->prepare($updateSql);
-    $updateStmt->bind_param("si", $newStatus, $subjectId);
-    $success = $updateStmt->execute();
-    $updateStmt->close();
-    return $success;
-}
+$stmt = $conn->prepare($query);
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$result = $stmt->get_result();
 
-// Handle status change
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['subject_id'])) {
-    $subjectId = $_POST['subject_id'];
-    $currentStatus = $_POST['current_status'];
-    $newStatus = ($currentStatus === 'publish') ? 'unpublish' : 'publish';
-
-    if (updateSubjectStatus($conn, $subjectId, $newStatus)) {
-        $_SESSION['success'] = 'Status has been updated';
-    } else {
-        $_SESSION['error'] = 'Status has not been updated';
+$subjects = []; // Initialize an array to store the fetched data
+if ($result->num_rows > 0) {
+    // Fetching results
+    while ($row = $result->fetch_assoc()) {
+        $subjects[] = $row;
     }
-
-    // Redirect to avoid form resubmission
-    header("Location: assign_subject.php");
-    exit();
 }
 
-// Get teacher subjects
-$result = getTeacherSubjects($conn, $userId);
-
-// Close the connection after all operations are done
+$stmt->close();
 $conn->close();
 ?>
 
@@ -74,52 +49,51 @@ $conn->close();
     <title>Teacher Assigned Subject</title>
 </head>
 <body>
-    <div class="navbar">
-        <a href="../teacher/dashboard.php">Dashboard</a>
-        <a href="../teacher/assign_subject.php">Assigned Subject</a>
-        <a href="../admin/announcement.php">Announcement</a>
-        <a href="../admin/registration.php">Registration</a>
-        <a href="../admin/student-registration.php">Student Registration</a>
-        <a href="../admin/calendar.php">Calendar</a>
-        <a href="../controller/LogoutController/logOut.php">Logout</a>
-    </div>
+  <div class="navbar">
+    <a href="../teacher/announcement.php">Announcement</a>
+    <a href="../teacher/assign_subject.php" style="color: wheat;">Assigned Subject</a>
+    <a href="../controller/LogoutController/logOut.php">Logout</a>
+  </div>
 
     <div class="container">
         <table>
             <thead>
                 <tr>
                     <th>Subject</th>
+                    <th>Week</th>
+                    <th>PDF File</th>
                     <th>Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
-                <?php
-                // Check if there are results
-                if ($result->num_rows > 0) {
-                    // Fetch and display each row
-                    while ($row = $result->fetch_assoc()) {
-                        $buttonText = ($row['status'] === 'publish') ? 'Unpublish' : 'Publish';
-                        $buttonColor = ($row['status'] === 'publish') ? 'red' : 'green';
-                        $newStatus = ($row['status'] === 'publish') ? 'unpublish' : 'publish';
-                        $subjectId = $row['subject_id'];
-
-                        echo '<tr>';
-                        echo '<td>' . htmlspecialchars($row['subject']) . '</td>';
-                        echo '<td>' . htmlspecialchars($row['status']) . '</td>';
-                        echo '<td>';
-                        echo '<form method="POST" action="">'; // Start form
-                        echo '<input type="hidden" name="subject_id" value="' . $subjectId . '">';
-                        echo '<input type="hidden" name="current_status" value="' . htmlspecialchars($row['status']) . '">';
-                        echo '<button type="submit" style="padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 4px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); background-color: ' . $buttonColor . '; color: white;">' . $buttonText . '</button>';
-                        echo '</form>'; // End form
-                        echo '</td>';
-                        echo '</tr>';
-                    }
-                } else {
-                    echo '<tr><td colspan="3">No subjects found.</td></tr>';
-                }
-                ?>
+                <?php if (!empty($subjects)): ?>
+                    <?php foreach ($subjects as $subject): ?>
+                        <tr>
+                            <td ><?= htmlspecialchars($subject['subject']) ?></td>
+                            <td><?= htmlspecialchars($subject['week']) ?></td>
+                            <td><a href="<?= htmlspecialchars($subject['image_url']) ?>" target="_blank">View PDF</a></td>
+                            <td><?= htmlspecialchars($subject['status']) ?></td>
+                            <td>
+                                <!-- Form for Publish/Unpublish -->
+                                <form method="POST" action="../controller/TeacherController/update_status.php">
+                                    <input type="hidden" name="id" value="<?= htmlspecialchars($subject['id']) ?>">
+                                    <?php if ($subject['status'] == 'publish'): ?>
+                                        <input type="hidden" name="action" value="unpublish">
+                                        <button type="submit" style="background-color:#dc3545;  color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;">Unpublish</button>
+                                    <?php else: ?>
+                                        <input type="hidden" name="action" value="publish">
+                                        <button type="submit" style="background-color:#28a745; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;">Publish</button>
+                                    <?php endif; ?>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="5">No subjects found</td>
+                    </tr>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
@@ -133,7 +107,7 @@ $conn->close();
               Swal.fire({
                   icon: 'success',
                   title: 'Success!',
-                  text: '<?php echo $_SESSION['success']; ?>',
+                  text: '<?= $_SESSION['success']; ?>',
                   confirmButtonText: 'OK'
               });
               <?php unset($_SESSION['success']); // Clear the session variable ?>
@@ -144,7 +118,7 @@ $conn->close();
               Swal.fire({
                   icon: 'error',
                   title: 'Oops...',
-                  text: '<?php echo $_SESSION['error']; ?>',
+                  text: '<?= $_SESSION['error']; ?>',
                   confirmButtonText: 'Try Again'
               });
               <?php unset($_SESSION['error']); // Clear the session variable ?>

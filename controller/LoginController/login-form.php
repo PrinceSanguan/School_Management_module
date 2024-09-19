@@ -44,10 +44,10 @@ if (isset($_POST['submit'])) {
                 header("Location: ../../admin/account-approval.php");
                 exit;
             } elseif ($role == 'student') {
-                header("Location: ../../student/dashboard.php");
+                header("Location: ../../student/announcement.php");
                 exit;
             } elseif ($role == 'teacher') {
-                header("Location: ../../teacher/dashboard.php");
+                header("Location: ../../teacher/announcement.php");
                 exit;
             } else {
                 echo "Invalid user role!";

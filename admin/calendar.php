@@ -1,3 +1,26 @@
+<?php
+include "../database/database.php";
+
+session_start();
+
+// Check if the user is logged in
+if (!isset($_SESSION['userId']) || !isset($_SESSION['userRole'])) {
+  $_SESSION['error'] = "Please log in to access this page.";
+  header("Location: ../../login.php");
+  exit();
+}
+
+// Check if the user is an admin or the verified user
+if ($_SESSION['userRole'] !== 'admin' && $_SESSION['userId'] != $subject['userId']) {
+  $_SESSION['error'] = "You do not have permission to access this page.";
+  header("Location: ../../index.php");
+  exit();
+}
+
+
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

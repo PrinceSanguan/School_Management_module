@@ -45,12 +45,22 @@ CREATE TABLE subject (
     FOREIGN KEY (section_id) REFERENCES section(id) ON DELETE CASCADE
 );
 
+-- Subject images table : store pdf file
+CREATE TABLE subject_images (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    subject_id INT NOT NULL,
+    week ENUM('week1', 'week2', 'week3', 'week4') NOT NULL,
+    status ENUM('unpublish', 'publish') DEFAULT 'publish',
+    image_url VARCHAR(255) NOT NULL,
+
+    FOREIGN KEY (subject_id) REFERENCES subject(id) ON DELETE CASCADE,
+);
+
 -- TeacherSubject table: links teachers to subjects they teach
 CREATE TABLE teacherSubject (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     subject_id INT NOT NULL,
-    status ENUM('unpublish', 'publish') DEFAULT 'publish',
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (subject_id) REFERENCES subject(id) ON DELETE CASCADE
 );
