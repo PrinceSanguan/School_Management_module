@@ -38,7 +38,7 @@ if ($result->num_rows > 0) {
     <title>Announcement</title>
     <style>
         .carousel-container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 50px auto;
             background-color: #0f3460;
             border-radius: 15px;
@@ -48,7 +48,7 @@ if ($result->num_rows > 0) {
         .carousel {
             position: relative;
             overflow: hidden;
-            height: 200px;
+            height: 500px;
         }
         .carousel-item {
             position: absolute;
@@ -58,7 +58,6 @@ if ($result->num_rows > 0) {
             height: 100%;
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
-            display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
@@ -106,7 +105,7 @@ if ($result->num_rows > 0) {
                 if (!empty($announcement['announcement'])) {
                     echo '<p>' . htmlspecialchars($announcement['announcement']) . '</p>';
                 } elseif (!empty($announcement['image_path'])) {
-                    echo '<img src="../../' . htmlspecialchars($announcement['image_path']) . '" alt="Announcement Image" style="max-width: 300px; max-height: 300px;">';
+                    echo '<img style="height: 400px" src="../../' . htmlspecialchars($announcement['image_path']) . '" alt="Announcement Image" style="max-width: 300px; max-height: 300px;">';
                 } else {
                     echo '<p>No content available</p>';
                 }
@@ -153,7 +152,7 @@ if ($result->num_rows > 0) {
         prevBtn.addEventListener('click', prevItem);
 
         // Auto-rotate every 5 seconds
-        setInterval(nextItem, 5000);
+        // setInterval(nextItem, 5000);
     </script>
 
     <!---- Sweet Alert ---->

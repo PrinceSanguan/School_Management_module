@@ -31,7 +31,7 @@ $conn->close();
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="../asset/css/account-approval.css">
+  <link rel="stylesheet" href="../../asset/css/account-approval.css">
   <!-- Sweet Alert -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <title>View Subject</title>

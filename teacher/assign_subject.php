@@ -38,6 +38,8 @@ if ($result->num_rows > 0) {
 
 $stmt->close();
 $conn->close();
+
+
 ?>
 
 <!DOCTYPE html>
@@ -55,7 +57,9 @@ $conn->close();
     <a href="../controller/LogoutController/logOut.php">Logout</a>
   </div>
 
+
     <div class="container">
+    
         <table>
             <thead>
                 <tr>
@@ -70,7 +74,7 @@ $conn->close();
                 <?php if (!empty($subjects)): ?>
                     <?php foreach ($subjects as $subject): ?>
                         <tr>
-                            <td ><?= htmlspecialchars($subject['subject']) ?></td>
+                            <td><?= htmlspecialchars($subject['subject']) ?></td>
                             <td><?= htmlspecialchars($subject['week']) ?></td>
                             <td><a href="<?= htmlspecialchars($subject['image_url']) ?>" target="_blank">View PDF</a></td>
                             <td><?= htmlspecialchars($subject['status']) ?></td>
@@ -80,12 +84,23 @@ $conn->close();
                                     <input type="hidden" name="id" value="<?= htmlspecialchars($subject['id']) ?>">
                                     <?php if ($subject['status'] == 'publish'): ?>
                                         <input type="hidden" name="action" value="unpublish">
-                                        <button type="submit" style="background-color:#dc3545;  color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;">Unpublish</button>
+                                        <button type="submit" style="background-color:#dc3545; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;">Unpublish</button>
                                     <?php else: ?>
                                         <input type="hidden" name="action" value="publish">
                                         <button type="submit" style="background-color:#28a745; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;">Publish</button>
                                     <?php endif; ?>
                                 </form>
+                                <br>
+                                <!-- Pass subject_id and subject name to the modal using data attributes -->
+                                <button 
+                                    style="background-color:#28a745; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;" 
+                                    
+                                    class="openModalBtn"
+                                    data-subject-id="<?= htmlspecialchars($subject['id']) ?>"
+                                    data-subject-name="<?= htmlspecialchars($subject['subject']) ?>"
+                                >
+                                    Add Module
+                                </button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -97,6 +112,40 @@ $conn->close();
             </tbody>
         </table>
     </div>
+
+    <!---------------ADD MODULE---------------------------->
+    <div class="modal" id="accountModal">
+    <div class="modal-content">
+        <button class="modal-close" id="closeModal">&times;</button>
+        <h2>Add Module</h2>
+
+        <form method="post" action="../controller/TeacherController/add_module.php" enctype="multipart/form-data">
+        <!-- This will be populated with the subject name dynamically -->
+        <label>Subject</label>
+        <input type="text" id="modalSubjectName" value="subject_name" readonly>
+
+        <!-- Hidden input to store the subject ID -->
+        <input type="hidden" id="modalSubjectId" name="subject_id">
+
+        <!-- Week selection -->
+        <label>Week</label>
+        <select name="week" required>
+            <option value="" disabled selected>Select Week</option>
+            <option value="week1">Week 1</option>
+            <option value="week2">Week 2</option>
+            <option value="week3">Week 3</option>
+            <option value="week4">Week 4</option>
+        </select>
+
+        <label>Module</label>
+        <input type="file" name="pdfFiles[]" id="pdfFiles" accept=".pdf" multiple required>
+
+        <button type="submit">Add Module</button>
+        </form>
+    </div>
+    </div>
+    <!---------------ADD MODULE---------------------------->
+
 
     <!-- Sweet Alert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -125,5 +174,45 @@ $conn->close();
           <?php endif; ?>
       });
     </script>
+
+<script>
+    // Get the modal element
+    const modal = document.getElementById('accountModal');
+
+    // Get the close button element
+    const closeModal = document.getElementById('closeModal');
+
+    // Get modal input fields for subject ID and name
+    const modalSubjectId = document.getElementById("modalSubjectId");
+    const modalSubjectName = document.getElementById("modalSubjectName");
+
+    // Add event listener to all buttons with class 'openModalBtn'
+    document.querySelectorAll('.openModalBtn').forEach(button => {
+        button.addEventListener('click', function() {
+            // Get data attributes from the clicked button
+            const subjectId = this.getAttribute('data-subject-id');
+            const subjectName = this.getAttribute('data-subject-name');
+
+            // Set the values in the modal input fields
+            modalSubjectId.value = subjectId;
+            modalSubjectName.value = subjectName;
+
+            // Show the modal
+            modal.style.display = "flex";
+        });
+    });
+
+    // Close modal when clicking the close button
+    closeModal.addEventListener('click', function() {
+        modal.style.display = 'none';
+    });
+
+    // Close modal when clicking outside the modal content
+    window.addEventListener('click', function(event) {
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+</script>
 </body>
 </html>

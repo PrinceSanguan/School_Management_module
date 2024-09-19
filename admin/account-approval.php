@@ -115,6 +115,7 @@ $conn->close();
           <input type="text" name="lastName" placeholder="Last Name" required>
           <input type="email" name="email" placeholder="Email" required>
           <input type="number" name="phone" placeholder="Phone" required min="0">
+          
           <!-- User role selection -->
           <label for="userRole">Role:</label>
           <select id="userRole" name="userRole" required>
