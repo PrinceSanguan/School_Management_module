@@ -10,32 +10,50 @@ if (!isset($_SESSION['userId']) || !isset($_SESSION['userRole'])) {
     exit();
 }
 
-// Check if the user is a teacher or the verified user
-if ($_SESSION['userRole'] !== 'teacher' && $_SESSION['userId'] != $subject['userId']) {
+// Get the user ID and role from the session
+$userId = $_SESSION['userId'];
+$userRole = $_SESSION['userRole'];
+
+// Verify if the user is a teacher
+if ($userRole !== 'teacher') {
     $_SESSION['error'] = "You do not have permission to access this page.";
     header("Location: ../../index.php");
     exit();
 }
 
-$userId = $_SESSION['userId']; // Get the user ID from session
-
 // Query to get subjects associated with the teacher
-$query = "SELECT subject.subject 
+$query = "SELECT subject.id, subject.subject 
           FROM teacherSubject
           JOIN subject ON teacherSubject.subject_id = subject.id
           WHERE teacherSubject.user_id = ?";
 
+// Prepare the SQL statement
 $stmt = $conn->prepare($query);
+if (!$stmt) {
+    $_SESSION['error'] = "Error preparing statement: " . $conn->error;
+    header("Location: ../../teacher/subject.php");
+    exit();
+}
+
+// Bind the user ID parameter
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $result = $stmt->get_result();
 
 $subjects = []; // Initialize an array to store the fetched data
+
 if ($result->num_rows > 0) {
     // Fetching results
     while ($row = $result->fetch_assoc()) {
-        $subjects[] = $row['subject']; // Storing only the subject name
+        // Store both subject name and id
+        $subjects[] = [
+            'id' => $row['id'],
+            'subject' => $row['subject']
+        ];
     }
+} else {
+    // No subjects found for this teacher
+    $_SESSION['error'] = "No subjects found for this teacher.";
 }
 
 $stmt->close();
@@ -94,7 +112,7 @@ $conn->close();
         <button class="modal-close" id="closeModal">&times;</button>
         <h2>Add Task</h2>
 
-        <form id="addAccountForm" method="post" action="">
+        <form id="addAccountForm" method="post" action="../controller/TeacherController/add_task.php" enctype="multipart/form-data">
 
           <!-- This is for Subject Module -->
           <label>Subject:</label>
@@ -102,8 +120,8 @@ $conn->close();
               <option value="" disabled selected>Select Subject</option>
               <?php if (!empty($subjects)): ?>
                   <?php foreach ($subjects as $subject): ?>
-                      <option value="<?php echo htmlspecialchars($subject); ?>">
-                          <?php echo htmlspecialchars($subject); ?>
+                      <option value="<?php echo htmlspecialchars($subject['id']); ?>">  <!-- Ensure 'id' is the subject's id from DB -->
+                          <?php echo htmlspecialchars($subject['subject']); ?>
                       </option>
                   <?php endforeach; ?>
               <?php else: ?>
@@ -112,21 +130,26 @@ $conn->close();
           </select>
 
             <!-- Select type of Content -->
-            <select name="" required>
+            <select name="postType" id="postType">
               <option value="" disabled selected>Select Type</option>
-              <option value="student">Image</option>
-              <option value="teacher">Text</option>
+              <option value="Image">Image</option>
+              <option value="Text">Text</option>
             </select>
 
           <!-- Show this image if this is select hide if not -->
-          <label for="pdfFiles">Upload Task:</label>
-          <input type="file" name="pdfFiles[]" id="pdfFiles" accept=".pdf" multiple>
+          <div id="imageUpload" style="display: none;">
+            <label>Upload Task:</label>
+            <input type="file" name="image[]" id="imageFile" accept=".png, .jpg, .jpeg, pdf" multiple>
+          </div>
 
           <!-- Show this textarea if this is select hide if not -->
-          <label>Write your task</label>
-          <textarea name="" rows="5" cols="65" placeholder="Place your task here"></textarea>
-
-          <input type="date" name="" id="">
+          <div id="textInput" style="display: none;">
+            <label>Write your task</label>
+            <textarea name="content" rows="5" cols="65" placeholder="Place your task here"></textarea>
+          </div>
+          
+          <label>Set Deadline:</label>
+          <input type="date" name="deadline" id="deadline">
 
           <button type="submit">Add Task</button>
         </form>
@@ -180,6 +203,41 @@ $conn->close();
       <?php endif; ?>
   });
 </script>
+
+<!--script for the date ---->
+<script>
+// Get the input element
+const deadlineInput = document.getElementById('deadline');
+
+// Set the minimum date to tomorrow
+const today = new Date();
+today.setDate(today.getDate() + 1); // Add one day to get tomorrow
+deadlineInput.min = today.toISOString().split('T')[0];
+</script>
+<!--script for the date ---->
+
+<!-- Script for hiding text and image-->
+<script>
+  document.getElementById('postType').addEventListener('change', function() {
+    var postType = this.value;
+    var imageUpload = document.getElementById('imageUpload');
+    var textInput = document.getElementById('textInput');
+
+    // Hide both initially
+    imageUpload.style.display = 'none';
+    textInput.style.display = 'none';
+
+    // Show image upload if "Image" is selected
+    if (postType === 'Image') {
+      imageUpload.style.display = 'block';
+    }
+    // Show textarea if "Text" is selected
+    else if (postType === 'Text') {
+      textInput.style.display = 'block';
+    }
+  });
+</script>
+<!-- Script for hiding text and image-->
 
 </body>
 </html>

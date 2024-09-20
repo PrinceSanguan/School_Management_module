@@ -53,7 +53,7 @@ CREATE TABLE task (
     id INT AUTO_INCREMENT PRIMARY KEY,
     subject_id INT NOT NULL,
     task_title VARCHAR(100) NOT NULL,
-    content VARCHAR(255) NOT NULL,
+    content VARCHAR(255) DEFAULT NULL,
     image_path VARCHAR(255) DEFAULT NULL,
     deadline DATE NOT NULL,
     status ENUM('active', 'inactive') DEFAULT 'active',
