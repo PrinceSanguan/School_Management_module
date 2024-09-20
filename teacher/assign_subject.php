@@ -54,6 +54,7 @@ $conn->close();
   <div class="navbar">
     <a href="../teacher/announcement.php">Announcement</a>
     <a href="../teacher/assign_subject.php" style="color: wheat;">Assigned Subject</a>
+    <a href="../teacher/task.php">Task</a>
     <a href="../controller/LogoutController/logOut.php">Logout</a>
   </div>
 

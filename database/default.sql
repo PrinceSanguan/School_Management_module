@@ -48,6 +48,19 @@ CREATE TABLE subject (
     FOREIGN KEY (section_id) REFERENCES section(id) ON DELETE CASCADE
 );
 
+-- Task table: store the task that connecting to the subject
+CREATE TABLE task (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    subject_id INT NOT NULL,
+    task_title VARCHAR(100) NOT NULL,
+    content VARCHAR(255) NOT NULL,
+    image_path VARCHAR(255) DEFAULT NULL,
+    deadline DATE NOT NULL,
+    status ENUM('active', 'inactive') DEFAULT 'active',
+
+    FOREIGN KEY (subject_id) REFERENCES subject(id) ON DELETE CASCADE
+);
+
 -- Subject images table : store pdf file
 CREATE TABLE subject_images (
     id INT AUTO_INCREMENT PRIMARY KEY,
