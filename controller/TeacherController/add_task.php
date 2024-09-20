@@ -5,6 +5,7 @@ require "../../database/config.php";
 
 // Get form data
 $subject_id = $_POST['subject'] ?? '';
+$task_title = $_POST['task_title'] ?? '';
 $content = $_POST['content'] ?? '';
 $date = $_POST['deadline'] ?? '';
 $postType = $_POST['postType'] ?? ''; // Determine whether it's an image or text post
@@ -87,12 +88,12 @@ if ($postType == 'Image') {
 }
 
 // Insert the task into the database
-$sql = "INSERT INTO task (subject_id, content, image_path, deadline, status) 
-        VALUES (?, ?, ?, ?, 'active')";
+$sql = "INSERT INTO task (subject_id, task_title, content, image_path, deadline, status) 
+        VALUES (?, ?, ?, ?, ?, 'active')";
 $stmt = $conn->prepare($sql);
 
 if ($stmt) {
-    $stmt->bind_param('isss', $subject_id, $content, $imagePath, $date);
+    $stmt->bind_param('issss', $subject_id, $task_title, $content, $imagePath, $date);
 
     if ($stmt->execute()) {
         $_SESSION['success'] = 'Task added successfully!';

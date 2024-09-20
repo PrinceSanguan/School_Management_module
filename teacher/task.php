@@ -57,6 +57,42 @@ if ($result->num_rows > 0) {
 }
 
 $stmt->close();
+
+
+// NEW LOGIC STARTS HERE
+
+// Query to fetch tasks related to the subjects
+$queryTasks = "SELECT task.id, subject.subject, task.task_title, task.content, task.image_path, task.deadline, task.status 
+               FROM task
+               JOIN subject ON task.subject_id = subject.id
+               JOIN teacherSubject ON teacherSubject.subject_id = subject.id
+               WHERE teacherSubject.user_id = ?";
+
+$stmtTasks = $conn->prepare($queryTasks);
+if (!$stmtTasks) {
+    $_SESSION['error'] = "Error preparing task statement: " . $conn->error;
+    header("Location: ../../teacher/tasks.php");
+    exit();
+}
+
+// Bind the user ID parameter for fetching tasks
+$stmtTasks->bind_param("i", $userId);
+$stmtTasks->execute();
+$resultTasks = $stmtTasks->get_result();
+
+$tasks = []; // Initialize an array to store the fetched tasks
+
+if ($resultTasks->num_rows > 0) {
+    // Fetching results
+    while ($rowTask = $resultTasks->fetch_assoc()) {
+        $tasks[] = $rowTask; // Store each task row
+    }
+} else {
+    // No tasks found
+    $_SESSION['error'] = "No tasks found.";
+}
+
+$stmtTasks->close();
 $conn->close();
 ?>
 
@@ -80,30 +116,57 @@ $conn->close();
     
     <button class="button" id="openModal" style="margin-bottom: 10px;">Add Task</button>
 
-    <table>
-        <thead>
+  <table>
+    <thead>
+        <tr>
+            <th>Subject</th>
+            <th>Task Title</th>
+            <th>Content</th>
+            <th>Deadline</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php if (!empty($tasks)): ?>
+            <?php foreach ($tasks as $task): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($task['subject']); ?></td>
+                    <td><?php echo htmlspecialchars($task['task_title']); ?></td>
+                    <td>
+                        <?php if (!empty($task['content'])): ?>
+                            <?php echo htmlspecialchars($task['content']); ?>
+                        <?php elseif (!empty($task['image_path'])): ?>
+                            <?php
+                            // Split multiple image paths by comma
+                            $imagePaths = explode(',', $task['image_path']);
+                            foreach ($imagePaths as $imagePath):
+                                // Correct the image path to point to the right folder
+                                if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+                                  $protocol = 'https://';
+                              } else {
+                                  $protocol = 'http://';
+                              }
+                              $correctedPath = $protocol . $_SERVER['HTTP_HOST'] . '/' . htmlspecialchars($imagePath);
+                            ?>
+                                <button onclick="viewImage('<?php echo $correctedPath; ?>')">View Image</button>
+                                <br>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            No content or image
+                        <?php endif; ?>
+                    </td>
+                    <td><?php echo date("F j, Y", strtotime($task['deadline'])); ?></td> <!-- Format deadline -->
+                    <td><?php echo ucfirst(htmlspecialchars($task['status'])); ?></td>
+                </tr>
+            <?php endforeach; ?>
+        <?php else: ?>
             <tr>
-                <th>Subject</th>
-                <th>Task Title</th>
-                <th>Content</th>
-                <th>Deadline</th>
-                <th>Status</th>
-                <th>Action</th>
+                <td colspan="6">No tasks available</td>
             </tr>
-        </thead>
-        <tbody>
-              <td>Math</td>
-              <td>Science Quiz</td>
-              <td>
-                <button>View</button>
-              </td>
-              <td>September 3, 2024</td>
-              <td>Active</td>
-              <td>
-                <button>Edit</button>
-              </td>
-        </tbody>
-    </table>
+        <?php endif; ?>
+    </tbody>
+</table>
+
 </div>
 
 <!---------------ADD TASK---------------------------->
@@ -128,6 +191,9 @@ $conn->close();
                   <option value="" disabled>No subjects assigned</option>
               <?php endif; ?>
           </select>
+
+          <!-- This is for task title -->
+          <input type="text" name="task_title" placeholder="Title of your task" required>
 
             <!-- Select type of Content -->
             <select name="postType" id="postType">
@@ -203,6 +269,14 @@ $conn->close();
       <?php endif; ?>
   });
 </script>
+
+<!--script for view image -->
+<script>
+    function viewImage(imagePath) {
+        window.open(imagePath, '_blank'); // Opens the image in a new tab
+    }
+</script>
+<!--script for view image -->
 
 <!--script for the date ---->
 <script>
