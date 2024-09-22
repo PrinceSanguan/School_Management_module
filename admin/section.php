@@ -42,6 +42,15 @@ if (!$result) {
   <link rel="stylesheet" href="../asset/css/account-approval.css">
   <!-- Sweet Alert -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+     <!-- Include DataTables CSS -->
+     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
   <title>Accounts</title>
   <style>
     /* Basic styling for the button */
@@ -110,7 +119,7 @@ if (!$result) {
 
 
     <!-- Table to display sections -->
-    <table>
+    <table id="myTable">
         <thead>
             <tr>
                 <th>Section</th>
@@ -184,6 +193,16 @@ if (!$result) {
         </div>
     </div>
   <!-- Add Subject Modal -->
+
+  <script>
+  $(document).ready(function() {
+      $('#myTable').DataTable({
+          "lengthChange": false, // Disable length menu
+          "searching": true,     // Enable the search box
+          "paging": true         // Keep pagination enabled (optional)
+      });
+  });
+</script>
 
 
 <script>

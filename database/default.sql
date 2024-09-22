@@ -68,6 +68,7 @@ CREATE TABLE subject_images (
     week ENUM('week1', 'week2', 'week3', 'week4') NOT NULL,
     status ENUM('unpublish', 'publish') DEFAULT 'publish',
     image_url VARCHAR(255) NOT NULL,
+    youtube_url VARCHAR(455) NOT NULL,
 
     FOREIGN KEY (subject_id) REFERENCES subject(id) ON DELETE CASCADE
 );

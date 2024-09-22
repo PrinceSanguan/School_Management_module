@@ -87,6 +87,15 @@ $conn->close();
   <link rel="stylesheet" href="../asset/css/account-approval.css">
   <!-- Sweet Alert -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+   <!-- Include DataTables CSS -->
+   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
   <title>Accounts</title>
 </head>
 <body>
@@ -138,25 +147,36 @@ $conn->close();
     </div>
      <!---------------ADD MODAL---------------------------->
 
-    <table>
-      <thead>
-        <tr>
-          <th>User Role</th>
-          <th>Full Name</th>
-          <th>Phone</th>
-          <th>Email</th>
-          <th>LRN (Only Student)</th>
-          <th>Parent (Only Student)</th>
-          <th>Address (Only Student)</th>
-          <th>Emergency Contact (Only Student)</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php echo $tableRows; ?>
-      </tbody>
+     <table id="myTable">
+        <thead>
+            <tr>
+                <th>User Role</th>
+                <th>Full Name</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>LRN (Only Student)</th>
+                <th>Parent (Only Student)</th>
+                <th>Address (Only Student)</th>
+                <th>Emergency Contact (Only Student)</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php echo $tableRows; ?>
+        </tbody>
     </table>
+
   </div>
+
+<script>
+  $(document).ready(function() {
+      $('#myTable').DataTable({
+          "lengthChange": false, // Disable length menu
+          "searching": true,     // Enable the search box
+          "paging": true         // Keep pagination enabled (optional)
+      });
+  });
+</script>
   
   <script>
     // JavaScript to toggle the visibility of the LRN field based on the user role selection

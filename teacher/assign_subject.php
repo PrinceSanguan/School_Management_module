@@ -16,8 +16,8 @@ if (!isset($_SESSION['userId'])) {
 
 $userId = $_SESSION['userId']; // Get the user ID from session
 
-// Query to get subjects associated with the teacher and their pdf files
-$query = "SELECT subject.subject, subject_images.id, subject_images.week, subject_images.image_url, subject_images.status 
+// Query to get subjects associated with the teacher and their pdf files or embedded videos
+$query = "SELECT subject.subject, subject_images.id, subject_images.week, subject_images.image_url, subject_images.youtube_url, subject_images.status 
           FROM teacherSubject
           JOIN subject ON teacherSubject.subject_id = subject.id
           JOIN subject_images ON subject.id = subject_images.subject_id
@@ -38,7 +38,6 @@ if ($result->num_rows > 0) {
 
 $stmt->close();
 $conn->close();
-
 
 ?>
 
@@ -61,91 +60,144 @@ $conn->close();
 
     <div class="container">
     
-        <table>
-            <thead>
+    <table>
+    <thead>
+        <tr>
+            <th>Subject</th>
+            <th>Week</th>
+            <th>PDF File/Embedded Video</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php if (!empty($subjects)): ?>
+            <?php foreach ($subjects as $subject): ?>
                 <tr>
-                    <th>Subject</th>
-                    <th>Week</th>
-                    <th>PDF File</th>
-                    <th>Status</th>
-                    <th>Action</th>
+                    <td><?= htmlspecialchars($subject['subject']) ?></td>
+                    <td><?= htmlspecialchars($subject['week']) ?></td>
+                    <td>
+                        <?php if (trim($subject['youtube_url']) === ''): ?>
+                            <!-- Display PDF link if youtube_url is empty (space or blank) -->
+                            <a href="<?= htmlspecialchars($subject['image_url']) ?>" target="_blank">View PDF</a>
+                        <?php elseif (trim($subject['image_url']) === ''): ?>
+                            <!-- Embed YouTube video if image_url is empty (space or blank) -->
+                            <?= $subject['youtube_url'] ?>
+                        <?php else: ?>
+                            <!-- Fallback in case both are empty or invalid -->
+                            N/A
+                        <?php endif; ?>
+                    </td>
+                    <td><?= htmlspecialchars($subject['status']) ?></td>
+                    <td>
+                        <!-- Form for Publish/Unpublish -->
+                        <form method="POST" action="../controller/TeacherController/update_status.php">
+                            <input type="hidden" name="id" value="<?= htmlspecialchars($subject['id']) ?>">
+                            <?php if ($subject['status'] == 'publish'): ?>
+                                <input type="hidden" name="action" value="unpublish">
+                                <button type="submit" style="background-color:#dc3545; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;">Unpublish</button>
+                            <?php else: ?>
+                                <input type="hidden" name="action" value="publish">
+                                <button type="submit" style="background-color:#28a745; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;">Publish</button>
+                            <?php endif; ?>
+                        </form>
+                        <br>
+                        <!-- Pass subject_id and subject name to the modal using data attributes -->
+                        <button 
+                            style="background-color:#28a745; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;" 
+                            class="openModalBtn"
+                            data-subject-id="<?= htmlspecialchars($subject['id']) ?>"
+                            data-subject-name="<?= htmlspecialchars($subject['subject']) ?>"
+                        >
+                            Add Module
+                        </button>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                <?php if (!empty($subjects)): ?>
-                    <?php foreach ($subjects as $subject): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($subject['subject']) ?></td>
-                            <td><?= htmlspecialchars($subject['week']) ?></td>
-                            <td><a href="<?= htmlspecialchars($subject['image_url']) ?>" target="_blank">View PDF</a></td>
-                            <td><?= htmlspecialchars($subject['status']) ?></td>
-                            <td>
-                                <!-- Form for Publish/Unpublish -->
-                                <form method="POST" action="../controller/TeacherController/update_status.php">
-                                    <input type="hidden" name="id" value="<?= htmlspecialchars($subject['id']) ?>">
-                                    <?php if ($subject['status'] == 'publish'): ?>
-                                        <input type="hidden" name="action" value="unpublish">
-                                        <button type="submit" style="background-color:#dc3545; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;">Unpublish</button>
-                                    <?php else: ?>
-                                        <input type="hidden" name="action" value="publish">
-                                        <button type="submit" style="background-color:#28a745; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;">Publish</button>
-                                    <?php endif; ?>
-                                </form>
-                                <br>
-                                <!-- Pass subject_id and subject name to the modal using data attributes -->
-                                <button 
-                                    style="background-color:#28a745; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;" 
-                                    
-                                    class="openModalBtn"
-                                    data-subject-id="<?= htmlspecialchars($subject['id']) ?>"
-                                    data-subject-name="<?= htmlspecialchars($subject['subject']) ?>"
-                                >
-                                    Add Module
-                                </button>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr>
-                        <td colspan="5">No subjects found</td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="5">No subjects found</td>
+            </tr>
+        <?php endif; ?>
+    </tbody>
+</table>
     </div>
 
+   <!---------------ADD MODULE---------------------------->
+<div class="modal" id="accountModal">
+  <div class="modal-content">
+    <button class="modal-close" id="closeModal">&times;</button>
+    <h2>Add Module</h2>
+
+    <form method="post" action="../controller/TeacherController/add_module.php" enctype="multipart/form-data">
+      <!-- This will be populated with the subject name dynamically -->
+      <label>Subject</label>
+      <input type="text" id="modalSubjectName" value="subject_name" readonly>
+
+      <!-- Hidden input to store the subject ID -->
+      <input type="hidden" id="modalSubjectId" name="subject_id">
+
+      <!-- Week selection -->
+      <label>Week</label>
+      <select name="week" required>
+        <option value="" disabled selected>Select Week</option>
+        <option value="week1">Week 1</option>
+        <option value="week2">Week 2</option>
+        <option value="week3">Week 3</option>
+        <option value="week4">Week 4</option>
+      </select>
+
+      <!-- Select type of Content -->
+      <label>Content Type</label>
+      <select name="postType" id="postType" required>
+        <option value="" disabled selected>Select Type</option>
+        <option value="Image">PDF Module</option>
+        <option value="Text">Embedded Video</option>
+      </select>
+
+      <!-- Video embed option -->
+      <div id="textInput" style="display: none;">
+        <label>Embed Youtube Video</label>
+        <input type="text" name="youtube_url" id="youtube_url">
+      </div>
+
+      <!-- PDF Upload option -->
+      <div id="imageUpload" style="display: none;">
+        <label>Upload Module (PDF)</label>
+        <input type="file" name="pdfFiles[]" id="pdfFiles" accept=".pdf" multiple>
+      </div>
+
+      <button type="submit">Add Module</button>
+    </form>
+  </div>
+</div>
     <!---------------ADD MODULE---------------------------->
-    <div class="modal" id="accountModal">
-    <div class="modal-content">
-        <button class="modal-close" id="closeModal">&times;</button>
-        <h2>Add Module</h2>
 
-        <form method="post" action="../controller/TeacherController/add_module.php" enctype="multipart/form-data">
-        <!-- This will be populated with the subject name dynamically -->
-        <label>Subject</label>
-        <input type="text" id="modalSubjectName" value="subject_name" readonly>
+    <script>
+    // Show/hide inputs based on postType selection
+    document.getElementById('postType').addEventListener('change', function() {
+    const postType = this.value;
+    const textInput = document.getElementById('textInput');
+    const imageUpload = document.getElementById('imageUpload');
+    const pdfFiles = document.getElementById('pdfFiles');
+    const youtubeUrl = document.getElementById('youtube_url');
 
-        <!-- Hidden input to store the subject ID -->
-        <input type="hidden" id="modalSubjectId" name="subject_id">
-
-        <!-- Week selection -->
-        <label>Week</label>
-        <select name="week" required>
-            <option value="" disabled selected>Select Week</option>
-            <option value="week1">Week 1</option>
-            <option value="week2">Week 2</option>
-            <option value="week3">Week 3</option>
-            <option value="week4">Week 4</option>
-        </select>
-
-        <label>Module</label>
-        <input type="file" name="pdfFiles[]" id="pdfFiles" accept=".pdf" multiple required>
-
-        <button type="submit">Add Module</button>
-        </form>
-    </div>
-    </div>
-    <!---------------ADD MODULE---------------------------->
+    if (postType === 'Image') {
+        textInput.style.display = 'none';
+        imageUpload.style.display = 'block';
+        youtubeUrl.value = ''; // Clear youtube URL when PDF is selected
+        youtubeUrl.required = false;
+        pdfFiles.required = true;
+    } else if (postType === 'Text') {
+        imageUpload.style.display = 'none';
+        textInput.style.display = 'block';
+        pdfFiles.value = ''; // Clear file input when video is selected
+        pdfFiles.required = false;
+        youtubeUrl.required = true;
+    }
+    });
+</script>
+<!-- Script for hiding text and image-->
 
 
     <!-- Sweet Alert -->
