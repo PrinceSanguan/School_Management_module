@@ -58,8 +58,8 @@ while ($subjectRow = $subjectResult->fetch_assoc()) {
     $subjectId = $subjectRow['subject_id'];
     $subjectName = $subjectRow['subject'];
 
-    // Fetch published subject images (modules) for this subject
-    $moduleQuery = "SELECT week, image_url 
+    // Fetch published subject images (modules) for this subject, including youtube_url
+    $moduleQuery = "SELECT week, image_url, youtube_url 
                     FROM subject_images 
                     WHERE subject_id = ? AND status = 'publish'";
 
@@ -73,7 +73,8 @@ while ($subjectRow = $subjectResult->fetch_assoc()) {
         $subjectsWithModules[] = [
             'subject' => $subjectName,
             'week' => $moduleRow['week'],
-            'image_url' => $moduleRow['image_url']
+            'image_url' => $moduleRow['image_url'],
+            'youtube_url' => $moduleRow['youtube_url']
         ];
     }
 }
@@ -90,13 +91,14 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../asset/css/account-approval.css">
-    <title>Admin Module</title>
+    <title>Student Dashboard</title>
 </head>
 <body>
 <div class="navbar">
-        <a href="../student/announcement.php">Announcement</a>
-        <a href="../student/admin_module.php" style="color: wheat;">Admin Module</a>
-        <a href="../controller/LogoutController/logOut.php">Logout</a>
+    <a href="../student/announcement.php">Announcement</a>
+    <a href="../student/admin_module.php" style="color: wheat;">Admin Module</a>
+    <a href="../student/task.php">Task</a>
+    <a href="../controller/LogoutController/logOut.php">Logout</a>
 </div>
 
 <div class="container">
@@ -105,7 +107,7 @@ $conn->close();
             <tr>
                 <th>Subject</th>
                 <th>Week</th>
-                <th>View PDF</th>
+                <th>View PDF/Embedded Video</th>
             </tr>
         </thead>
         <tbody>
@@ -114,12 +116,23 @@ $conn->close();
                     <tr>
                         <td><?= htmlspecialchars($module['subject']) ?></td>
                         <td><?= htmlspecialchars($module['week']) ?></td>
-                        <td><a href="<?= htmlspecialchars($module['image_url']) ?>" target="_blank">View PDF</a></td>
+                        <td>
+                            <?php if (!empty(trim($module['image_url']))): ?>
+                                <!-- Display PDF link if image_url is not empty -->
+                                <a href="<?= htmlspecialchars($module['image_url']) ?>" target="_blank">View PDF</a>
+                            <?php elseif (!empty(trim($module['youtube_url']))): ?>
+                                <!-- Display embedded YouTube video if youtube_url is not empty -->
+                                 <?= $module['youtube_url'] ?>
+                            <?php else: ?>
+                                <!-- Fallback if both are empty -->
+                                N/A
+                            <?php endif; ?>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
             <?php else: ?>
                 <tr>
-                    <td colspan="4">No published modules found.</td>
+                    <td colspan="3">No published modules found.</td>
                 </tr>
             <?php endif; ?>
         </tbody>
