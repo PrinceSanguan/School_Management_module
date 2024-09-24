@@ -58,7 +58,7 @@ while ($subjectRow = $subjectResult->fetch_assoc()) {
     $subjectName = $subjectRow['subject'];
 
     // Step 3: Fetch tasks associated with the subject
-    $taskQuery = "SELECT task_title, content, image_path, deadline 
+    $taskQuery = "SELECT id, task_title, content, image_path, deadline 
                   FROM task 
                   WHERE subject_id = ? AND status = 'active'";
 
@@ -69,12 +69,30 @@ while ($subjectRow = $subjectResult->fetch_assoc()) {
 
     // Add tasks to the array
     while ($taskRow = $taskResult->fetch_assoc()) {
+        $taskId = $taskRow['id'];
+
+        // Step 4: Fetch the student's answer and feedback for the task
+        $answerQuery = "SELECT text_answer, image_path, feedback 
+                        FROM taskAnswer 
+                        WHERE task_id = ? AND student_id = ?";
+        
+        $answerStmt = $conn->prepare($answerQuery);
+        $answerStmt->bind_param("ii", $taskId, $userId);
+        $answerStmt->execute();
+        $answerResult = $answerStmt->get_result();
+        $answer = $answerResult->fetch_assoc();
+        
+        // Add tasks and answers to the array
         $tasks[] = [
             'subject' => $subjectName,
             'task_title' => $taskRow['task_title'],
             'content' => $taskRow['content'],
             'image_path' => $taskRow['image_path'],
-            'deadline' => $taskRow['deadline']
+            'deadline' => $taskRow['deadline'],
+            'id' => $taskId,
+            'student_answer_text' => $answer['text_answer'] ?? null,
+            'student_answer_image' => $answer['image_path'] ?? null,
+            'feedback' => $answer['feedback'] ?? null
         ];
     }
 }
@@ -83,6 +101,7 @@ while ($subjectRow = $subjectResult->fetch_assoc()) {
 $sectionStmt->close();
 $subjectStmt->close();
 $taskStmt->close();
+$answerStmt->close();
 $conn->close();
 ?>
 
@@ -103,41 +122,189 @@ $conn->close();
 </div>
 
 <div class="container">
-    <table>
-        <thead>
-            <tr>
-                <th>Subject</th>
-                <th>Task Title</th>
-                <th>Task Details</th>
-                <th>Deadline</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php if (!empty($tasks)): ?>
-                <?php foreach ($tasks as $task): ?>
-                    <tr>
-                        <td><?= htmlspecialchars($task['subject']) ?></td>
-                        <td><?= htmlspecialchars($task['task_title']) ?></td>
-                        <td>
-                            <?php if (!empty($task['content'])): ?>
-                                <?= htmlspecialchars($task['content']) ?>
-                            <?php elseif (!empty($task['image_path'])): ?>
-                                <img src="../<?= htmlspecialchars($task['image_path']) ?>" alt="Task Image" style="max-width: 200px; height: auto;">
-                            <?php else: ?>
-                                No details available.
-                            <?php endif; ?>
-                        </td>
-                        <td><?= htmlspecialchars($task['deadline']) ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            <?php else: ?>
+
+<table>
+    <thead>
+        <tr>
+            <th>Subject</th>
+            <th>Task Title</th>
+            <th>Task Details</th>
+            <th>Deadline</th>
+            <th>Action</th>
+            <th>Answer</th>
+            <th>Feedback</th>
+            <th>Delete Answer</th> <!-- New column for the delete button -->
+        </tr>
+    </thead>
+    <tbody>
+        <?php if (!empty($tasks)): ?>
+            <?php foreach ($tasks as $task): ?>
                 <tr>
-                    <td colspan="4">No tasks found.</td>
+                    <td><?= htmlspecialchars($task['subject']) ?></td>
+                    <td><?= htmlspecialchars($task['task_title']) ?></td>
+                    <td>
+                        <?php if (!empty($task['content'])): ?>
+                            <?= htmlspecialchars($task['content']) ?>
+                        <?php elseif (!empty($task['image_path'])): ?>
+                            <img src="../<?= htmlspecialchars($task['image_path']) ?>" alt="Task Image" style="max-width: 200px; height: auto;">
+                        <?php else: ?>
+                            No details available.
+                        <?php endif; ?>
+                    </td>
+                    <td><?= htmlspecialchars($task['deadline']) ?></td>
+                    <td>
+                        <!-- Conditionally disable the submit button if an answer already exists -->
+                        <button class="button openModal" 
+                                data-task-id="<?= htmlspecialchars($task['id']) ?>"
+                                <?= !empty($task['student_answer_text']) || !empty($task['student_answer_image']) ? 'disabled' : '' ?>>
+                            Submit Answer
+                        </button>
+                    </td>
+                    <td>
+                        <!-- Display the student's answer (either text or image) -->
+                        <?php if (!empty($task['student_answer_image'])): ?>
+                            <img src="../../uploads/answer/<?= htmlspecialchars($task['student_answer_image']) ?>" alt="Submitted Image" style="max-width: 200px; height: auto;">
+                        <?php elseif (!empty($task['student_answer_text'])): ?>
+                            <?= htmlspecialchars($task['student_answer_text']) ?>
+                        <?php else: ?>
+                            No answer submitted.
+                        <?php endif; ?>
+                    </td>
+                    <td>
+                        <!-- Display feedback -->
+                        <?= !empty($task['feedback']) ? htmlspecialchars($task['feedback']) : 'No feedback yet.' ?>
+                    </td>
+                    <td>
+                        <!-- Add Delete button if the answer exists -->
+                        <?php if (!empty($task['student_answer_text']) || !empty($task['student_answer_image'])): ?>
+                            <form method="post" action="../controller/StudentController/delete_answer.php" style="display:inline;">
+                                <input type="hidden" name="task_id" value="<?= htmlspecialchars($task['id']) ?>">
+                                <input type="hidden" name="student_id" value="<?= htmlspecialchars($userId) ?>"> <!-- Student ID from session -->
+                                <button type="submit" class="button delete-btn">Delete</button>
+                            </form>
+                        <?php else: ?>
+                            No answer to delete.
+                        <?php endif; ?>
+                    </td>
                 </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <tr>
+                <td colspan="8">No tasks found.</td>
+            </tr>
+        <?php endif; ?>
+    </tbody>
+</table>
+
+
 </div>
+
+<!---------------ADD MODAL---------------------------->
+<div class="modal" id="accountModal">
+    <div class="modal-content">
+        <button class="modal-close" id="closeModal">&times;</button>
+        <h2>Submit Answer</h2>
+
+        <!-- Form to add an announcement -->
+        <form id="addAccountForm" method="post" action="../controller/StudentController/submit_taskAnswer.php" enctype="multipart/form-data">
+
+            <!-- Hidden input for task ID -->
+            <input type="hidden" name="task_id" id="taskId">
+
+            <!-- Select option to choose what to post -->
+            <label for="postType">What do you want to submit?</label>
+            <select name="postType" id="postType">
+                <option value="" disabled selected>Select an option</option>
+                <option value="Image">Image</option>
+                <option value="Text">Text</option>
+            </select>
+
+            <!-- Hidden image input field -->
+            <div id="imageUpload" style="display: none;">
+                <label>Upload Image or PDF</label>
+                <input type="file" name="image_path" id="imageFile" accept=".png, .jpg, .jpeg, .pdf">
+            </div>
+
+            <!-- Hidden textarea input field -->
+            <div id="textInput" style="display: none;">
+                <label>Text answer</label>
+                <textarea name="text_answer" rows="5" cols="65" placeholder="Submit your answer here"></textarea>
+            </div>
+
+            <!-- Submit button -->
+            <button type="submit">Submit Answer</button>
+        </form>
+    </div>
+</div>
+<!---------------ADD MODAL---------------------------->
+
+       <!-- JavaScript to handle showing/hiding fields -->
+<script>
+  document.getElementById('postType').addEventListener('change', function() {
+    var postType = this.value;
+    var imageUpload = document.getElementById('imageUpload');
+    var textInput = document.getElementById('textInput');
+
+    // Hide both initially
+    imageUpload.style.display = 'none';
+    textInput.style.display = 'none';
+
+    // Show image upload if "Image" is selected
+    if (postType === 'Image') {
+      imageUpload.style.display = 'block';
+    }
+    // Show textarea if "Text" is selected
+    else if (postType === 'Text') {
+      textInput.style.display = 'block';
+    }
+  });
+</script>
+
+<script>
+    document.querySelectorAll('.openModal').forEach(button => {
+        button.addEventListener('click', function() {
+            document.getElementById('accountModal').style.display = 'flex';
+            
+            // Set the task ID in the hidden input
+            const taskId = this.getAttribute('data-task-id');
+            document.getElementById('taskId').value = taskId;  // Set hidden input value
+        });
+
+        
+        document.getElementById('closeModal').addEventListener('click', function() {
+            document.getElementById('accountModal').style.display = 'none';
+        });
+    });
+</script>
+
+<!---- Sweet Alert ---->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+      document.addEventListener('DOMContentLoaded', function () {
+          // Check for success message
+          <?php if (isset($_SESSION['success'])): ?>
+              Swal.fire({
+                  icon: 'success',
+                  title: 'Success!',
+                  text: '<?php echo $_SESSION['success']; ?>',
+                  confirmButtonText: 'OK'
+              });
+              <?php unset($_SESSION['success']); // Clear the session variable ?>
+          <?php endif; ?>
+
+          // Check for error message
+          <?php if (isset($_SESSION['error'])): ?>
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Oops...',
+                  text: '<?php echo $_SESSION['error']; ?>',
+                  confirmButtonText: 'Try Again'
+              });
+              <?php unset($_SESSION['error']); // Clear the session variable ?>
+          <?php endif; ?>
+      });
+    </script>
 
 </body>
 </html>

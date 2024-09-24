@@ -61,6 +61,20 @@ CREATE TABLE task (
     FOREIGN KEY (subject_id) REFERENCES subject(id) ON DELETE CASCADE
 );
 
+-- TaskAnswer table: store the task that connecting to the Task
+
+CREATE TABLE taskAnswer (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    task_id INT NOT NULL,
+    student_id INT NOT NULL,
+    text_answer VARCHAR(255) DEFAULT NULL,
+    image_path VARCHAR(255) DEFAULT NULL,
+    feedback VARCHAR(255) DEFAULT NULL,
+
+    FOREIGN KEY (task_id) REFERENCES task(id) ON DELETE CASCADE,
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 -- Subject images table : store pdf file
 CREATE TABLE subject_images (
     id INT AUTO_INCREMENT PRIMARY KEY,
