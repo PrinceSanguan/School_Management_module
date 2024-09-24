@@ -116,7 +116,7 @@ $conn->close();
     
     <button class="button" id="openModal" style="margin-bottom: 10px;">Add Task</button>
 
-  <table>
+    <table>
     <thead>
         <tr>
             <th>Subject</th>
@@ -130,8 +130,14 @@ $conn->close();
         <?php if (!empty($tasks)): ?>
             <?php foreach ($tasks as $task): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($task['subject']); ?></td>
-                    <td><?php echo htmlspecialchars($task['task_title']); ?></td>
+                    <td>
+                        <?php echo htmlspecialchars($task['subject']); ?>
+                    </td>
+                    <td>
+                        <a href="../controller/TeacherController/task_details.php?id=<?php echo urlencode($task['id']); ?>">
+                            <?php echo htmlspecialchars($task['task_title']); ?>
+                        </a>
+                    </td>
                     <td>
                         <?php if (!empty($task['content'])): ?>
                             <?php echo htmlspecialchars($task['content']); ?>
@@ -142,11 +148,11 @@ $conn->close();
                             foreach ($imagePaths as $imagePath):
                                 // Correct the image path to point to the right folder
                                 if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
-                                  $protocol = 'https://';
-                              } else {
-                                  $protocol = 'http://';
-                              }
-                              $correctedPath = $protocol . $_SERVER['HTTP_HOST'] . '/' . htmlspecialchars($imagePath);
+                                    $protocol = 'https://';
+                                } else {
+                                    $protocol = 'http://';
+                                }
+                                $correctedPath = $protocol . $_SERVER['HTTP_HOST'] . '/' . htmlspecialchars($imagePath);
                             ?>
                                 <button onclick="viewImage('<?php echo $correctedPath; ?>')">View Image</button>
                                 <br>
@@ -155,7 +161,7 @@ $conn->close();
                             No content or image
                         <?php endif; ?>
                     </td>
-                    <td><?php echo date("F j, Y", strtotime($task['deadline'])); ?></td> <!-- Format deadline -->
+                    <td><?php echo date("F j, Y", strtotime($task['deadline'])); ?></td>
                     <td><?php echo ucfirst(htmlspecialchars($task['status'])); ?></td>
                 </tr>
             <?php endforeach; ?>

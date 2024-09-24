@@ -109,6 +109,7 @@ if (!$result) {
     <a href="../admin/registration.php">Registration</a>
     <a href="../admin/student-registration.php">Student Registration</a>
     <a href="../admin/calendar.php">Calendar</a>
+    <a href="../admin/archive.php">Archive</a>
     <a href="../controller/LogoutController/logOut.php">Logout</a>
   </div>
 

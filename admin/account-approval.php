@@ -23,18 +23,19 @@ if (!$conn) {
 
 // Handle delete request
 if (isset($_GET['delete'])) {
-    $userId = intval($_GET['delete']);
-    $deleteQuery = "DELETE FROM users WHERE id = ?";
-    $stmt = $conn->prepare($deleteQuery);
-    $stmt->bind_param("i", $userId);
-    
-    if ($stmt->execute()) {
-        $_SESSION['success'] = 'The account is already deleted!';
-        header("Location: ../admin/account-approval.php");
-        exit(); // Redirect to the page displaying the table
-    } else {
-        echo "Error deleting record: " . $conn->error;
-    }
+  $userId = intval($_GET['delete']);
+  // Update the query to set is_archived to 1 instead of deleting the record
+  $archiveQuery = "UPDATE users SET is_archived = 1 WHERE id = ?";
+  $stmt = $conn->prepare($archiveQuery);
+  $stmt->bind_param("i", $userId);
+  
+  if ($stmt->execute()) {
+      $_SESSION['success'] = 'The account has been archived!';
+      header("Location: ../admin/account-approval.php");
+      exit(); // Redirect to the page displaying the table
+  } else {
+      echo "Error archiving record: " . $conn->error;
+  }
 }
 
 // Query to get user information including additional fields from studentLrn
@@ -46,34 +47,35 @@ $query = "
            COALESCE(s.number, 'N/A') AS number
     FROM users u
     LEFT JOIN studentLrn s ON u.id = s.user_id
+    WHERE u.is_archived = 0
 ";
 $result = $conn->query($query);
 
 if ($result->num_rows > 0) {
-  $tableRows = '';
-  while ($row = $result->fetch_assoc()) {
-      $deleteButton = '';
-      if ($row['userRole'] !== 'admin') {
-          $deleteButton = '<a href="?delete=' . htmlspecialchars($row['id']) . '" onclick="return confirm(\'Are you sure you want to delete this user?\');"><button class="button">Delete</button></a>';
-      }
+    $tableRows = '';
+    while ($row = $result->fetch_assoc()) {
+        $deleteButton = '';
+        if ($row['userRole'] !== 'admin') {
+            $deleteButton = '<a href="?delete=' . htmlspecialchars($row['id']) . '" onclick="return confirm(\'Are you sure you want to delete this user?\');"><button class="button">Delete</button></a>';
+        }
 
-      $tableRows .= '<tr>
-          <td>' . htmlspecialchars($row['userRole']) . '</td>
-          <td>' . htmlspecialchars($row['fullName']) . '</td>
-          <td>' . htmlspecialchars($row['phone']) . '</td>
-          <td>' . htmlspecialchars($row['email']) . '</td>
-          <td>' . htmlspecialchars($row['lrn']) . '</td>
-          <td>' . htmlspecialchars($row['parent']) . '</td>
-          <td>' . htmlspecialchars($row['address']) . '</td>
-          <td>' . htmlspecialchars($row['number']) . '</td>
-          <td>
-              <a href="edit-account.php?id=' . htmlspecialchars($row['id']) . '"><button class="button">Edit</button></a>
-              ' . $deleteButton . '
-          </td>
-      </tr>';
-  }
+        $tableRows .= '<tr>
+            <td>' . htmlspecialchars($row['userRole']) . '</td>
+            <td>' . htmlspecialchars($row['fullName']) . '</td>
+            <td>' . htmlspecialchars($row['phone']) . '</td>
+            <td>' . htmlspecialchars($row['email']) . '</td>
+            <td>' . htmlspecialchars($row['lrn']) . '</td>
+            <td>' . htmlspecialchars($row['parent']) . '</td>
+            <td>' . htmlspecialchars($row['address']) . '</td>
+            <td>' . htmlspecialchars($row['number']) . '</td>
+            <td>
+                <a href="edit-account.php?id=' . htmlspecialchars($row['id']) . '"><button class="button">Edit</button></a>
+                ' . $deleteButton . '
+            </td>
+        </tr>';
+    }
 } else {
-  $tableRows = '<tr><td colspan="9">No records found.</td></tr>';
+    $tableRows = '<tr><td colspan="9">No records found.</td></tr>';
 }
 
 $conn->close();
@@ -107,6 +109,7 @@ $conn->close();
     <a href="../admin/registration.php">Registration</a>
     <a href="../admin/student-registration.php">Student Registration</a>
     <a href="../admin/calendar.php">Calendar</a>
+    <a href="../admin/archive.php">Archive</a>
     <a href="../controller/LogoutController/logOut.php">Logout</a>
   </div>
 

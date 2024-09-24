@@ -92,6 +92,32 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../asset/css/account-approval.css">
     <title>Student Dashboard</title>
+    <style>
+        .progress-bar-container {
+            width: 100%;
+            background-color: #f3f3f3;
+            border-radius: 5px;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 20px;
+            width: 0;
+            background-color: #4caf50;
+            border-radius: 5px;
+            transition: width 0.5s;
+        }
+
+        .progress-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            top: 0;
+            line-height: 20px; /* Center vertically */
+            color: #000;
+        }
+    </style>
 </head>
 <body>
 <div class="navbar">
@@ -100,6 +126,11 @@ $conn->close();
     <a href="../student/task.php">Task</a>
     <a href="../controller/LogoutController/logOut.php">Logout</a>
 </div>
+
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
+        <div class="progress-text" id="progressText">0% - You're just getting started</div>
+    </div>
 
 <div class="container">
     <table>
@@ -118,13 +149,10 @@ $conn->close();
                         <td><?= htmlspecialchars($module['week']) ?></td>
                         <td>
                             <?php if (!empty(trim($module['image_url']))): ?>
-                                <!-- Display PDF link if image_url is not empty -->
-                                <a href="<?= htmlspecialchars($module['image_url']) ?>" target="_blank">View PDF</a>
+                                <a href="<?= htmlspecialchars($module['image_url']) ?>" class="view-pdf" target="_blank">View PDF</a>
                             <?php elseif (!empty(trim($module['youtube_url']))): ?>
-                                <!-- Display embedded YouTube video if youtube_url is not empty -->
-                                 <?= $module['youtube_url'] ?>
+                                <?= $module['youtube_url'] ?>
                             <?php else: ?>
-                                <!-- Fallback if both are empty -->
                                 N/A
                             <?php endif; ?>
                         </td>
@@ -137,7 +165,51 @@ $conn->close();
             <?php endif; ?>
         </tbody>
     </table>
+
 </div>
+
+<script>
+    let progress = 0;
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const viewedPDFs = new Set();
+
+    function updateProgress() {
+        if (progress <= 100) {
+            progressBar.style.width = progress + '%';
+            const messages = [
+                '0% - You\'re just getting started! Every great journey begins with a single step. Keep going!',
+                '10% - You\'re making progress! Keep up the momentum, and soon you\'ll see the fruits of your hard work.',
+                '20% - Great Job! You\'re well on your way. Remember, consistency is the key to success.',
+                '30% - You\'re doing amazing! Stay focused and keep pushing forward. You\'re closer than you think.',
+                '40% - Halfway there! You’ve come so far. Keep up the great work, and you’ll reach your goal.',
+                '50% - Fantastic progress! The effort you’re putting in now will pay off big time. Keep it up!',
+                '60% - You’re in the home stretch! Stay strong and keep your eye on the prize.',
+                '70% - Almost there! Your dedication is inspiring. Just a little further to go!',
+                '80% - You’re so close! Keep pushing, and you’ll soon achieve what you set out to do.',
+                '100% - Congratulations! You’ve made it to the finish line. Celebrate your success. You’ve earned it!'
+            ];
+            progressText.textContent = messages[Math.floor(progress / 10)];
+
+            if (progress < 100) {
+                progress++;
+            }
+        }
+    }
+
+    document.querySelectorAll('.view-pdf').forEach(link => {
+        link.addEventListener('click', (event) => {
+            const pdfUrl = event.currentTarget.href;
+            if (!viewedPDFs.has(pdfUrl)) {
+                viewedPDFs.add(pdfUrl);
+                if (progress < 100) {
+                    progress += 10; // Increase progress by 10% on first click
+                    updateProgress();
+                }
+            }
+        });
+    });
+</script>
 
 </body>
 </html>

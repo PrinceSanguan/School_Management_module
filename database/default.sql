@@ -7,7 +7,8 @@ CREATE TABLE users (
     phone VARCHAR(20),
     password VARCHAR(255) NOT NULL,
     userRole ENUM('admin', 'teacher', 'student') NOT NULL,
-    changePassword ENUM('yes', 'no') DEFAULT 'no'
+    changePassword ENUM('yes', 'no') DEFAULT 'no',
+    is_archived TINYINT(1) DEFAULT 0
 );
 
 -- Announcements table: stores announcements that can be viewed by different roles
