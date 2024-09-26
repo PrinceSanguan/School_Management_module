@@ -1,6 +1,10 @@
 <?php
 include "../../database/database.php";
 require "../../database/config.php";
+require '../../vendor/autoload.php'; // Assuming PHPMailer is located here
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 // Get form data
 $firstName = $_POST['firstName'] ?? '';
@@ -72,9 +76,46 @@ if ($stmt->execute()) {
         $lrnStmt->close();
     }
 
-    $_SESSION['success'] = 'Registration successful!';
+    // Send email notification
+    $mail = new PHPMailer(true);
+
+    // Configure PHPMailer
+    $mail->isSMTP();
+    $mail->Host = 'smtp.gmail.com'; // Assuming Gmail
+    $mail->SMTPAuth = true;
+    $mail->Username = '3870852@gmail.com'; // Replace with your Gmail address
+    $mail->Password = 'hrnj rgts pqhe atpb'; // Replace with your Gmail app password
+    $mail->SMTPSecure = 'tls';
+    $mail->Port = 587;
+
+    // Email content
+    $mail->setFrom('3870852@gmail.com', 'SPED SCHOOL');
+    $mail->addAddress($email, $firstName . ' ' . $lastName); // Send to user's email
+
+    $mail->isHTML(true); // Set email format to HTML
+
+    $mail->Subject = 'Your Account Has Been Created';
+    $mail->Body = "
+        <h1>Welcome, {$firstName} {$lastName}!</h1>
+        <p>Your account has been successfully created. Below are your login details:</p>
+        <p><strong>Email:</strong> {$email}</p>
+        <p><strong>Temporary Password:</strong> {$password}</p>
+        <p>Please change your password after your first login.</p>
+        <br><br>
+        <p>Best regards,</p>
+        <p>SPED school</p>
+    ";
+
+    // Send the email
+    if (!$mail->send()) {
+        $_SESSION['error'] = 'Failed to send email: ' . $mail->ErrorInfo;
+    } else {
+        $_SESSION['success'] = 'Registration successful! An email with your credentials has been sent.';
+    }
+
     header("Location: ../../admin/account-approval.php");
     exit();
+
 } else {
     $_SESSION['error'] = 'Failed to create User: ' . $stmt->error;
     $stmt->close();
