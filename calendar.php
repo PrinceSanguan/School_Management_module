@@ -154,6 +154,67 @@ body {
 #deleteEvent.hidden {
     display: none;
 }
+
+/* Mobile responsiveness */
+@media screen and (max-width: 768px) {
+    #calendar {
+        grid-template-columns: repeat(3, 1fr); /* Reduce columns to 3 */
+        gap: 5px;
+    }
+
+    #monthYear {
+        font-size: 1.5em;
+    }
+
+    .day {
+        padding: 10px;
+    }
+
+    .calendar-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    #prevMonth, #nextMonth {
+        font-size: 1em;
+        padding: 8px;
+    }
+
+    #prevMonth, #nextMonth {
+        width: 48%; /* Reduce button width */
+    }
+}
+
+@media screen and (max-width: 480px) {
+    #calendar {
+        grid-template-columns: repeat(2, 1fr); /* Reduce to 2 columns */
+        gap: 5px;
+    }
+
+    #monthYear {
+        font-size: 1.2em;
+    }
+
+    .day {
+        padding: 8px;
+        font-size: 0.8em;
+    }
+
+    #prevMonth, #nextMonth {
+        font-size: 0.9em;
+        padding: 6px;
+    }
+
+    .calendar-header {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    #prevMonth, #nextMonth {
+        width: 45%; /* Buttons take less space on mobile */
+    }
+}
+
     </style>
 </head>
 <body>
