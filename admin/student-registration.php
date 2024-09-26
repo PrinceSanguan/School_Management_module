@@ -63,14 +63,14 @@ $studentSections = $conn->query($query);
     <a href="../admin/section.php">Section</a>
     <a href="../admin/announcement.php">Announcement</a>
     <a href="../admin/registration.php">Assign Teacher</a>
-    <a href="../admin/student-registration.php" style="color:wheat">Student Registration</a>
+    <a href="../admin/student-registration.php" style="color:wheat">Assign Student</a>
     <a href="../admin/calendar.php">Calendar</a>
     <a href="../admin/archive.php">Archive</a>
     <a href="../controller/LogoutController/logOut.php">Logout</a>
   </div>
 
   <div class="container">
-    <button class="button" id="openModal" style="margin-bottom: 10px;">Register a Student</button>
+    <button class="button" id="openModal" style="margin-bottom: 10px;">Assign a Student</button>
 
   <table>
     <thead>

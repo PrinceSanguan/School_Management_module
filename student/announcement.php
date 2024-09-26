@@ -92,7 +92,7 @@ if ($result->num_rows > 0) {
 <body>
     <div class="navbar">
         <a href="../student/announcement.php" style="color: wheat;">Announcement</a>
-        <a href="../student/admin_module.php">Admin Module</a>
+        <a href="../student/admin_module.php">Modules</a>
         <a href="../student/task.php">Task</a>
         <a href="../controller/LogoutController/logOut.php">Logout</a>
     </div>

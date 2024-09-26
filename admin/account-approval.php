@@ -56,7 +56,7 @@ if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $deleteButton = '';
         if ($row['userRole'] !== 'admin') {
-            $deleteButton = '<a href="?delete=' . htmlspecialchars($row['id']) . '" onclick="return confirm(\'Are you sure you want to delete this user?\');"><button class="button">Delete</button></a>';
+            $deleteButton = '<a href="?delete=' . htmlspecialchars($row['id']) . '" onclick="return confirm(\'Are you sure you want to delete this user?\');"><button class="buttons">Delete</button></a>';
         }
 
         $tableRows .= '<tr>
@@ -107,7 +107,7 @@ $conn->close();
     <a href="../admin/section.php">Section</a>
     <a href="../admin/announcement.php">Announcement</a>
     <a href="../admin/registration.php">Assign Teacher</a>
-    <a href="../admin/student-registration.php">Student Registration</a>
+    <a href="../admin/student-registration.php">Assign Student</a>
     <a href="../admin/calendar.php">Calendar</a>
     <a href="../admin/archive.php">Archive</a>
     <a href="../controller/LogoutController/logOut.php">Logout</a>

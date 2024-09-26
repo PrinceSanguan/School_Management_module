@@ -116,7 +116,7 @@ $conn->close();
 <body>
 <div class="navbar">
     <a href="../student/announcement.php">Announcement</a>
-    <a href="../student/admin_module.php">Admin Module</a>
+    <a href="../student/admin_module.php">Modules</a>
     <a href="../student/task.php" style="color: wheat;">Task</a>
     <a href="../controller/LogoutController/logOut.php">Logout</a>
 </div>

@@ -63,7 +63,7 @@ $result = $conn->query($query);
   </div>
 
   <div class="container">
-    <button class="button" id="openModal" style="margin-bottom: 10px;">Add Teacher Subject</button>
+    <button class="button" id="openModal" style="margin-bottom: 10px;">Assign a Teacher</button>
 
     <table>
     <thead>

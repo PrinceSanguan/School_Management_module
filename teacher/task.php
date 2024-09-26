@@ -107,7 +107,7 @@ $conn->close();
 <body>
     <div class="navbar">
         <a href="../teacher/announcement.php">Announcement</a>
-        <a href="../teacher/assign_subject.php">Assigned Subject</a>
+        <a href="../teacher/assign_subject.php">Subject</a>
         <a href="../teacher/task.php" style="color: wheat;">Task</a>
         <a href="../controller/LogoutController/logOut.php">Logout</a>
     </div>

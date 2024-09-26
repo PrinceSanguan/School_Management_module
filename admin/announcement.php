@@ -49,7 +49,7 @@ $conn->close();
     <a href="../admin/section.php">Section</a>
     <a href="../admin/announcement.php" style="color:wheat">Announcement</a>
     <a href="../admin/registration.php">Assign Teacher</a>
-    <a href="../admin/student-registration.php">Student Registration</a>
+    <a href="../admin/student-registration.php">Assign Student</a>
     <a href="../admin/calendar.php">Calendar</a>
     <a href="../admin/archive.php">Archive</a>
     <a href="../controller/LogoutController/logOut.php">Logout</a>
