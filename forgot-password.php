@@ -46,7 +46,7 @@
             <h2 class="title-fpw">Reset Password</h2>
             <p class="p-forgotpw">Enter the email address your account is registered with and we'll send you an instructions.</p>
         </div>
-        <form action="send-password-reset.php" method="POST">
+        <form action="controller/LoginController/send-password-reset.php" method="post">
             <div class="input-forgotpw">
                 <label for="" class="labeltitle">Enter Your Email</label>
                 <input type="email" name="email" placeholder="Enter your email">
