@@ -93,16 +93,15 @@ require 'database/config.php';
   <h1>Enroll For Our Specialized Teaching for Students with Disabilities</h1>
   <div class="row">
     <div class="cta-cols">
-
       <div>
-      <i class='bx bxs-home'></i>
+        <i class='bx bxs-home'></i>
         <span> 
           <h5>C. Lawis Extension, Brgy. San Isidro, Antipolo City 1870</h5>
         </span>
       </div>
 
       <div>
-      <i class='bx bxs-phone' ></i>
+        <i class='bx bxs-phone'></i>
         <span>   
           <h5>631-48-43 Landline</h5>
           <p>Monday to Saturday, 9AM to 5PM</p>
@@ -110,7 +109,7 @@ require 'database/config.php';
       </div>
 
       <div>
-      <i class='bx bx-envelope' ></i> 
+        <i class='bx bx-envelope'></i> 
         <span>  
           <h5>antipolosped@gmail.com</h5>
           <p>Email us</p>
@@ -119,16 +118,34 @@ require 'database/config.php';
     </div>
 
     <div class="cta-cols">
-
-      <form action="email.php" method="POST">
+      <form id="contactForm">
         <input type="text" name="name" placeholder="Enter your name" required>
         <input type="Email" name="email" placeholder="Enter email address" required>
         <input type="text" name="subject" placeholder="Enter your subject" required>
         <textarea rows="8" name="message" placeholder="Message" required></textarea>
+        
+        <!-- Google-like Captcha -->
+        <div id="captcha" style="margin-bottom: 10px; display: flex; align-items: center;">
+          <div id="captchaBox" style="border: 2px solid #d3d3d3; border-radius: 3px; padding: 10px; display: inline-flex; align-items: center; cursor: pointer;">
+            <div id="captchaCheckbox" style="width: 24px; height: 24px; border: 2px solid #c1c1c1; border-radius: 2px; margin-right: 10px;"></div>
+            <span>I'm not a robot</span>
+          </div>
+          <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" alt="reCAPTCHA" style="margin-left: 10px; width: 32px;">
+        </div>
+
+        <div id="mathProblem" style="display: none; margin-top: 10px;">
+          <span id="problem"></span>
+          <input type="number" id="captchaInput" required>
+        </div>
+
         <button type="submit" class="contact-us">Send Message</button>
       </form>
+      
+      <!-- Confirmation Message (hidden by default) -->
+      <div id="confirmationMessage" style="display: none; color: green; margin-top: 10px;">
+        Your message has been sent!
+      </div>
     </div>
-
   </div>
 </section>
 
@@ -187,6 +204,67 @@ require 'database/config.php';
           <?php unset($_SESSION['error']); // Clear the session variable ?>
       <?php endif; ?>
   });
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('contactForm');
+  const confirmationMessage = document.getElementById('confirmationMessage');
+  const captchaBox = document.getElementById('captchaBox');
+  const captchaCheckbox = document.getElementById('captchaCheckbox');
+  const mathProblem = document.getElementById('mathProblem');
+  const problemSpan = document.getElementById('problem');
+  const captchaInput = document.getElementById('captchaInput');
+
+  let answer;
+
+  function generateMathProblem() {
+    const num1 = Math.floor(Math.random() * 10) + 1;
+    const num2 = Math.floor(Math.random() * 10) + 1;
+    const operation = Math.random() < 0.5 ? '+' : '-';
+    
+    problemSpan.textContent = `What is ${num1} ${operation} ${num2}?`;
+    
+    answer = operation === '+' ? num1 + num2 : num1 - num2;
+  }
+
+  captchaBox.addEventListener('click', function() {
+    captchaCheckbox.style.backgroundColor = '#4CAF50';
+    captchaCheckbox.innerHTML = '&#10004;'; // Checkmark
+    captchaCheckbox.style.color = 'white';
+    mathProblem.style.display = 'block';
+    generateMathProblem();
+  });
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault(); // Prevent actual form submission
+
+    if (captchaInput.value === '') {
+      alert('Please complete the captcha.');
+      return;
+    }
+
+    if (parseInt(captchaInput.value) !== answer) {
+      alert('Incorrect captcha. Please try again.');
+      generateMathProblem();
+      return;
+    }
+
+    // Hide form and show confirmation message
+    form.style.display = 'none';
+    confirmationMessage.style.display = 'block';
+
+    // Reset form (in case user wants to send another message)
+    setTimeout(() => {
+      form.reset();
+      form.style.display = 'block';
+      confirmationMessage.style.display = 'none';
+      captchaCheckbox.style.backgroundColor = 'transparent';
+      captchaCheckbox.innerHTML = '';
+      mathProblem.style.display = 'none';
+    }, 3000); // Reset after 3 seconds
+  });
+});
 </script>
 
 </body>
