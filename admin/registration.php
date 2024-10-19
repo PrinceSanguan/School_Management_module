@@ -5,16 +5,31 @@ session_start();
 
 // Check if the user is logged in
 if (!isset($_SESSION['userId']) || !isset($_SESSION['userRole'])) {
-  $_SESSION['error'] = "Please log in to access this page.";
-  header("Location: ../../login.php");
-  exit();
+    $_SESSION['error'] = "Please log in to access this page.";
+    header("Location: ../../login.php");
+    exit();
 }
 
-// Check if the user is an admin or the verified user
-if ($_SESSION['userRole'] !== 'admin' && $_SESSION['userId'] != $subject['userId']) {
-  $_SESSION['error'] = "You do not have permission to access this page.";
-  header("Location: ../../index.php");
-  exit();
+// Check if the user is an admin
+if ($_SESSION['userRole'] !== 'admin') {
+    $_SESSION['error'] = "You do not have permission to access this page.";
+    header("Location: ../../index.php");
+    exit();
+}
+
+// Handle the "Clear all Subjects" button action
+if (isset($_GET['clear_subjects'])) {
+    // Delete all records from the teacherSubject table (clears all teacher-subject associations)
+    $deleteQuery = "DELETE FROM teacherSubject";
+    if ($conn->query($deleteQuery) === TRUE) {
+        $_SESSION['success'] = "All subjects have been cleared successfully.";
+    } else {
+        $_SESSION['error'] = "Failed to clear subjects. Please try again.";
+    }
+
+    // Redirect back to the same page
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
 }
 
 // Fetch teachers
@@ -34,9 +49,8 @@ $query = "
     WHERE u.userRole = 'teacher'
 ";
 $result = $conn->query($query);
-
-
 ?>
+
 
 
 <!DOCTYPE html>
@@ -47,6 +61,15 @@ $result = $conn->query($query);
   <link rel="stylesheet" href="../asset/css/account-approval.css">
   <!-- Sweet Alert -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Include DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+
+  <!-- Include jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
   <title>Accounts</title>
 </head>
 <body>
@@ -64,14 +87,15 @@ $result = $conn->query($query);
 
   <div class="container">
     <button class="button" id="openModal" style="margin-bottom: 10px;">Assign a Teacher</button>
+    <button class="button" style="margin-bottom: 10px; background-color: red;" onclick="confirmClearSubjects()">Clear all Subjects</button>
 
-    <table>
+    <table id="myTable">
     <thead>
-      <tr>
-        <th>Teacher</th>
-        <th>Subject Handle</th>
-        <th>Action</th>
-      </tr>
+        <tr>
+            <th>Teacher</th>
+            <th>Subject Handle</th>
+            <th>Action</th>
+        </tr>
     </thead>
     <tbody>
     <?php
@@ -79,12 +103,12 @@ $result = $conn->query($query);
           while ($row = $result->fetch_assoc()) {
               echo "
               <tr>
-                  <td>" . $row['firstName'] . " " . $row['lastName'] . "</td>
-                  <td>" . $row['subject'] . "</td>
+                  <td>" . htmlspecialchars($row['firstName']) . " " . htmlspecialchars($row['lastName']) . "</td>
+                  <td>" . htmlspecialchars($row['subject']) . "</td>
                   <td>
                       <form action='../controller/AdminController/delete-subject-teacher.php' method='post'>
-                          <input type='hidden' name='teacher_id' value='" . $row['teacher_id'] . "'>
-                          <input type='hidden' name='subject_id' value='" . $row['subject_id'] . "'> <!-- Include subject_id -->
+                          <input type='hidden' name='teacher_id' value='" . htmlspecialchars($row['teacher_id']) . "'>
+                          <input type='hidden' name='subject_id' value='" . htmlspecialchars($row['subject_id']) . "'>
                           <button type='submit' class='delete-button' style='background-color: #f44336; color: white; border: none; padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 4px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);'>Delete</button>
                       </form>
                   </td>
@@ -92,11 +116,11 @@ $result = $conn->query($query);
               ";
           }
       } else {
-          echo "<tr><td colspan='3'>No teacher-subject assignments found.</td></tr>";
+          echo "<tr><td class='text-center'>No teacher-subject assignments found.</td><td></td><td></td></tr>";
       }
-      ?>
+    ?>
     </tbody>
-  </table>
+</table>
     
   </div>
 
@@ -183,6 +207,25 @@ $result = $conn->query($query);
       });
     </script>
 
+<script>
+  $(document).ready(function() {
+      $('#myTable').DataTable({
+          "lengthChange": false, // Disable length menu
+          "searching": true,     // Enable the search box
+          "paging": true         // Keep pagination enabled (optional)
+      });
+  });
+</script>
+
+<!------- DELETE SUBJECT -------------------->
+<script>
+  function confirmClearSubjects() {
+      if (confirm("Are you sure you want to reset all subjects? This action cannot be undone.")) {
+          window.location.href = '<?php echo $_SERVER['PHP_SELF']; ?>?clear_subjects=true';
+      }
+  }
+</script>
+<!------- DELETE SUBJECT -------------------->
 </body>
 </html>
 

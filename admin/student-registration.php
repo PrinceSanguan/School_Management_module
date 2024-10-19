@@ -5,16 +5,31 @@ session_start();
 
 // Check if the user is logged in
 if (!isset($_SESSION['userId']) || !isset($_SESSION['userRole'])) {
-  $_SESSION['error'] = "Please log in to access this page.";
-  header("Location: ../../login.php");
-  exit();
+    $_SESSION['error'] = "Please log in to access this page.";
+    header("Location: ../../login.php");
+    exit();
 }
 
 // Check if the user is an admin or the verified user
 if ($_SESSION['userRole'] !== 'admin' && $_SESSION['userId'] != $subject['userId']) {
-  $_SESSION['error'] = "You do not have permission to access this page.";
-  header("Location: ../../index.php");
-  exit();
+    $_SESSION['error'] = "You do not have permission to access this page.";
+    header("Location: ../../index.php");
+    exit();
+}
+
+// Handle the "Clear all Sections" button action
+if (isset($_GET['clear_sections'])) {
+    // Delete all student-section relationships
+    $deleteQuery = "DELETE FROM studentSection";
+    if ($conn->query($deleteQuery) === TRUE) {
+        $_SESSION['success'] = "All student-section relationships have been cleared successfully.";
+    } else {
+        $_SESSION['error'] = "Failed to clear student-section relationships. Please try again.";
+    }
+
+    // Redirect back to the same page
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
 }
 
 // Fetch students who are not already in a section
@@ -42,7 +57,6 @@ $query = "
 ";
 $studentSections = $conn->query($query);
 
-
 ?>
 
 
@@ -54,6 +68,14 @@ $studentSections = $conn->query($query);
   <link rel="stylesheet" href="../asset/css/account-approval.css">
   <!-- Sweet Alert -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Include DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Include DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
   <title>Student Registration</title>
 </head>
 <body>
@@ -71,8 +93,9 @@ $studentSections = $conn->query($query);
 
   <div class="container">
     <button class="button" id="openModal" style="margin-bottom: 10px;">Assign a Student</button>
+    <button class="button" style="margin-bottom: 10px; background-color: red;" onclick="confirmClearSection()">Clear all Section</button>
 
-  <table>
+  <table id="myTable">
     <thead>
       <tr>
         <th>Student Name</th>
@@ -188,6 +211,26 @@ $studentSections = $conn->query($query);
           <?php endif; ?>
       });
     </script>
+
+<script>
+  $(document).ready(function() {
+      $('#myTable').DataTable({
+          "lengthChange": false, // Disable length menu
+          "searching": true,     // Enable the search box
+          "paging": true         // Keep pagination enabled (optional)
+      });
+  });
+</script>
+
+<!------- DELETE ALL SECTION -------------------->
+<script>
+  function confirmClearSection() {
+      if (confirm("Are you sure you want to reset all section? This action cannot be undone.")) {
+          window.location.href = '<?php echo $_SERVER['PHP_SELF']; ?>?clear_sections=true';
+      }
+  }
+</script>
+<!------- DELETE ALL SECTION -------------------->
 
 </body>
 </html>

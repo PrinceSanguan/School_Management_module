@@ -72,11 +72,6 @@ if (isset($_POST['submit'])) {
 
 <div class="container">
 
-    <?php if (isset($_SESSION['error'])): ?>
-        <div class="error"><?= htmlspecialchars($_SESSION['error']); ?></div>
-        <?php unset($_SESSION['error']); ?>
-    <?php endif; ?>
-
     <div class="container">
     <div class="box">
       <div class="logoform">
@@ -108,8 +103,8 @@ if (isset($_POST['submit'])) {
       // Check for success message
       <?php if (isset($_SESSION['success'])): ?>
           Swal.fire({
-              icon: 'info',
-              title: 'Important Message',
+              icon: 'success',
+              title: 'Success!',
               text: '<?php echo $_SESSION['success']; ?>',
               confirmButtonText: 'OK'
           });
@@ -128,5 +123,6 @@ if (isset($_POST['submit'])) {
       <?php endif; ?>
   });
 </script>
+
 </body>
 </html>
