@@ -16,11 +16,11 @@ if (!isset($_SESSION['userId'])) {
 
 $userId = $_SESSION['userId']; // Get the user ID from session
 
-// Query to get subjects associated with the teacher and their pdf files or embedded videos
-$query = "SELECT subject.subject, subject_images.id, subject_images.week, subject_images.image_url, subject_images.youtube_url, subject_images.status 
+// Query to get subjects associated with the teacher
+$query = "SELECT DISTINCT subject.id AS subject_id, subject.subject, subject_images.week, subject_images.status 
           FROM teacherSubject
           JOIN subject ON teacherSubject.subject_id = subject.id
-          JOIN subject_images ON subject.id = subject_images.subject_id
+          LEFT JOIN subject_images ON subject.id = subject_images.subject_id
           WHERE teacherSubject.user_id = ?";
 
 $stmt = $conn->prepare($query);
@@ -29,16 +29,23 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 $subjects = []; // Initialize an array to store the fetched data
+$uniqueSubjects = []; // Array to track unique subject names
+
 if ($result->num_rows > 0) {
     // Fetching results
     while ($row = $result->fetch_assoc()) {
-        $subjects[] = $row;
+        $subjectName = $row['subject'];
+        
+        // Only add the subject if it's not already in the uniqueSubjects array
+        if (!isset($uniqueSubjects[$subjectName])) {
+            $uniqueSubjects[$subjectName] = true; // Mark this subject as added
+            $subjects[] = $row; // Add to the subjects array
+        }
     }
 }
 
 $stmt->close();
 $conn->close();
-
 ?>
 
 <!DOCTYPE html>
@@ -47,83 +54,94 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../asset/css/account-approval.css">
-    <title>Teacher Assigned Subject</title>
+    <title>Teacher Assigned Subjects</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: black;
+        }
+        .subject-link {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .subject-link:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-  <div class="navbar">
-    <a href="../teacher/announcement.php">Announcement</a>
-    <a href="../teacher/assign_subject.php" style="color: wheat;">Subject</a>
-    <a href="../teacher/task.php">Task</a>
-    <a href="../controller/LogoutController/logOut.php">Logout</a>
-  </div>
-
-
-    <div class="container">
-    
-    <table>
-    <thead>
-        <tr>
-            <th>Subject</th>
-            <th>Week</th>
-            <th>PDF File/Embedded Video</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php if (!empty($subjects)): ?>
-            <?php foreach ($subjects as $subject): ?>
-                <tr>
-                    <td><?= htmlspecialchars($subject['subject']) ?></td>
-                    <td><?= htmlspecialchars($subject['week']) ?></td>
-                    <td>
-                        <?php if (trim($subject['youtube_url']) === ''): ?>
-                            <!-- Display PDF link if youtube_url is empty (space or blank) -->
-                            <a href="<?= htmlspecialchars($subject['image_url']) ?>" target="_blank">View PDF</a>
-                        <?php elseif (trim($subject['image_url']) === ''): ?>
-                            <!-- Embed YouTube video if image_url is empty (space or blank) -->
-                            <?= $subject['youtube_url'] ?>
-                        <?php else: ?>
-                            <!-- Fallback in case both are empty or invalid -->
-                            N/A
-                        <?php endif; ?>
-                    </td>
-                    <td><?= htmlspecialchars($subject['status']) ?></td>
-                    <td>
-                        <!-- Form for Publish/Unpublish -->
-                        <form method="POST" action="../controller/TeacherController/update_status.php">
-                            <input type="hidden" name="id" value="<?= htmlspecialchars($subject['id']) ?>">
-                            <?php if ($subject['status'] == 'publish'): ?>
-                                <input type="hidden" name="action" value="unpublish">
-                                <button type="submit" style="background-color:#dc3545; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;">Unpublish</button>
-                            <?php else: ?>
-                                <input type="hidden" name="action" value="publish">
-                                <button type="submit" style="background-color:#28a745; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;">Publish</button>
-                            <?php endif; ?>
-                        </form>
-                        <br>
-                        <!-- Pass subject_id and subject name to the modal using data attributes -->
-                        <button 
-                            style="background-color:#28a745; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;" 
-                            class="openModalBtn"
-                            data-subject-id="<?= htmlspecialchars($subject['id']) ?>"
-                            data-subject-name="<?= htmlspecialchars($subject['subject']) ?>"
-                        >
-                            Add Module
-                        </button>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <tr>
-                <td colspan="5">No subjects found</td>
-            </tr>
-        <?php endif; ?>
-    </tbody>
-</table>
+    <div class="navbar">
+        <a href="../teacher/announcement.php">Announcement</a>
+        <a href="../teacher/assign_subject.php" style="color: wheat;">Subject</a>
+        <a href="../teacher/task.php">Task</a>
+        <a href="../teacher/profile.php">Profile</a>
+        <a href="../controller/LogoutController/logOut.php">Logout</a>
     </div>
 
-   <!---------------ADD MODULE---------------------------->
+    <div class="container">
+        <h2>Assigned Subjects</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Week</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php if (!empty($subjects)): ?>
+                    <?php foreach ($subjects as $subject): ?>
+                        <tr>
+                            <td>
+                                <a href="subject_modules.php?subject_id=<?= urlencode($subject['subject_id']) ?>" class="subject-link">
+                                    <?= htmlspecialchars($subject['subject']) ?>
+                                </a>
+                            </td>
+                            <td><?= htmlspecialchars($subject['week']) ?></td>
+                            <td><?= htmlspecialchars($subject['status']) ?></td>
+                            <td>
+                                <form method="POST" action="../controller/TeacherController/update_status.php">
+                                    <input type="hidden" name="id" value="<?= htmlspecialchars($subject['subject_id']) ?>">
+                                    <?php if ($subject['status'] == 'publish'): ?>
+                                        <input type="hidden" name="action" value="unpublish">
+                                        <button type="submit" style="background-color:#dc3545; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;">Unpublish</button>
+                                    <?php else: ?>
+                                        <input type="hidden" name="action" value="publish">
+                                        <button type="submit" style="background-color:#28a745; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;">Publish</button>
+                                    <?php endif; ?>
+                                </form>
+                                <br>
+                                <button 
+                                    style="background-color:#28a745; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;" 
+                                    class="openModalBtn"
+                                    data-subject-id="<?= htmlspecialchars($subject['subject_id']) ?>"
+                                    data-subject-name="<?= htmlspecialchars($subject['subject']) ?>"
+                                >
+                                    Add Module
+                                </button>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="4">No subjects found</td>
+                    </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+
+    
+<!---------------ADD MODULE---------------------------->
 <div class="modal" id="accountModal">
   <div class="modal-content">
     <button class="modal-close" id="closeModal">&times;</button>
@@ -173,7 +191,7 @@ $conn->close();
 </div>
     <!---------------ADD MODULE---------------------------->
 
-    <script>
+<script>
     // Show/hide inputs based on postType selection
     document.getElementById('postType').addEventListener('change', function() {
     const postType = this.value;
@@ -198,8 +216,7 @@ $conn->close();
     });
 </script>
 <!-- Script for hiding text and image-->
-
-
+    
     <!-- Sweet Alert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
@@ -227,6 +244,7 @@ $conn->close();
           <?php endif; ?>
       });
     </script>
+
 
 <script>
     // Get the modal element

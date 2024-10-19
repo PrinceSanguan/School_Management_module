@@ -94,6 +94,7 @@ if ($result->num_rows > 0) {
         <a href="../teacher/announcement.php" style="color: wheat;">Announcement</a>
         <a href="../teacher/assign_subject.php">Subject</a>
         <a href="../teacher/task.php">Task</a>
+        <a href="../teacher/profile.php">Profile</a>
         <a href="../controller/LogoutController/logOut.php">Logout</a>
     </div>
 
