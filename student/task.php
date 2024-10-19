@@ -118,6 +118,7 @@ $conn->close();
     <a href="../student/announcement.php">Announcement</a>
     <a href="../student/admin_module.php">Modules</a>
     <a href="../student/task.php" style="color: wheat;">Task</a>
+    <a href="../student/profile.php">Profile</a>
     <a href="../controller/LogoutController/logOut.php">Logout</a>
 </div>
 
