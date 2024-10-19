@@ -5,7 +5,7 @@ session_start();
 
 // Check if the user is an admin
 if (!isset($_SESSION['userRole']) || $_SESSION['userRole'] !== 'admin') {
-    $_SESSION['error'] = "You do not have permission to access this page!.";
+    $_SESSION['error'] = "You do not have permission to access this page!";
     header("Location: ../index.php");
     exit();
 }
@@ -14,60 +14,47 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-if (isset($_GET['id'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
     $userId = intval($_GET['id']);
-    
-    // Fetch user details and role, including additional fields from studentLrn
-    $query = "
-        SELECT u.*, s.lrn, s.parent, s.address, s.number 
-        FROM users u 
-        LEFT JOIN studentLrn s ON u.id = s.user_id 
-        WHERE u.id = ?
-    ";
+
+    // Fetch user details
+    $query = "SELECT firstName, lastName, phone, email FROM users WHERE id = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("i", $userId);
     $stmt->execute();
     $result = $stmt->get_result();
     $user = $result->fetch_assoc();
-    
+
     if (!$user) {
-        die("User not found.");
+        http_response_code(404);
+        echo json_encode(['error' => 'User not found.']);
+        exit();
     }
-    
+
+    // Return the user data as JSON
+    header('Content-Type: application/json');
+    echo json_encode($user);
+    exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $userId = intval($_POST['userId']);
+    $firstName = $_POST['firstName'];
+    $lastName = $_POST['lastName'];
+    $phone = $_POST['phone'];
+    $email = $_POST['email'];
+
     // Update user details
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $firstName = $_POST['firstName'];
-        $lastName = $_POST['lastName'];
-        $phone = $_POST['phone'];
-        $email = $_POST['email'];
-        $lrn = isset($_POST['lrn']) ? $_POST['lrn'] : null;
-        $parent = isset($_POST['parent']) ? $_POST['parent'] : null;
-        $address = isset($_POST['address']) ? $_POST['address'] : null;
-        $number = isset($_POST['number']) ? $_POST['number'] : null;
-        
-        // Update user details
-        $updateQuery = "UPDATE users SET firstName = ?, lastName = ?, phone = ?, email = ? WHERE id = ?";
-        $updateStmt = $conn->prepare($updateQuery);
-        $updateStmt->bind_param("ssssi", $firstName, $lastName, $phone, $email, $userId);
-        
-        if ($updateStmt->execute()) {
-            // If the user is a student, update LRN and additional fields
-            if ($user['userRole'] == 'student') {
-                // Update LRN if provided
-                if ($lrn !== null) {
-                    $lrnUpdateQuery = "UPDATE studentLrn SET lrn = ?, parent = ?, address = ?, number = ? WHERE user_id = ?";
-                    $lrnStmt = $conn->prepare($lrnUpdateQuery);
-                    $lrnStmt->bind_param("ssssi", $lrn, $parent, $address, $number, $userId);
-                    $lrnStmt->execute();
-                }
-            }
-            
-            $_SESSION['success'] = 'The account has been updated!';
-            header("Location: ../admin/account-approval.php");
-            exit();
-        } else {
-            echo "Error updating record: " . $conn->error;
-        }
+    $updateQuery = "UPDATE users SET firstName = ?, lastName = ?, phone = ?, email = ? WHERE id = ?";
+    $updateStmt = $conn->prepare($updateQuery);
+    $updateStmt->bind_param("ssssi", $firstName, $lastName, $phone, $email, $userId);
+
+    if ($updateStmt->execute()) {
+        $_SESSION['success'] = 'The account has been updated!';
+        header("Location: ../admin/account-approval.php");
+        exit();
+    } else {
+        echo "Error updating record: " . $conn->error;
     }
 }
 ?>

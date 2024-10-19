@@ -60,19 +60,19 @@ if ($result->num_rows > 0) {
         }
 
         $tableRows .= '<tr>
-            <td>' . htmlspecialchars($row['userRole']) . '</td>
-            <td>' . htmlspecialchars($row['fullName']) . '</td>
-            <td>' . htmlspecialchars($row['phone']) . '</td>
-            <td>' . htmlspecialchars($row['email']) . '</td>
-            <td>' . htmlspecialchars($row['lrn']) . '</td>
-            <td>' . htmlspecialchars($row['parent']) . '</td>
-            <td>' . htmlspecialchars($row['address']) . '</td>
-            <td>' . htmlspecialchars($row['number']) . '</td>
-            <td>
-                <a href="edit-account.php?id=' . htmlspecialchars($row['id']) . '"><button class="button">Edit</button></a>
-                ' . $deleteButton . '
-            </td>
-        </tr>';
+        <td>' . htmlspecialchars($row['userRole']) . '</td>
+        <td>' . htmlspecialchars($row['fullName']) . '</td>
+        <td>' . htmlspecialchars($row['phone']) . '</td>
+        <td>' . htmlspecialchars($row['email']) . '</td>
+        <td>' . htmlspecialchars($row['lrn']) . '</td>
+        <td>' . htmlspecialchars($row['parent']) . '</td>
+        <td>' . htmlspecialchars($row['address']) . '</td>
+        <td>' . htmlspecialchars($row['number']) . '</td>
+        <td>
+            <button class="button edit-btn" data-id="' . htmlspecialchars($row['id']) . '">Edit</button>
+            ' . $deleteButton . '
+        </td>
+    </tr>';
     }
 } else {
     $tableRows = '<tr><td colspan="9">No records found.</td></tr>';
@@ -149,6 +149,32 @@ $conn->close();
       </div>
     </div>
      <!---------------ADD MODAL---------------------------->
+
+<!---------------EDIT MODAL---------------------------->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Edit User</h2>
+        <form id="editForm" method="post" action="edit-account.php">
+            <label for="firstName">First Name:</label>
+            <input type="text" id="firstName" name="firstName" required><br><br>
+
+            <label for="lastName">Last Name:</label>
+            <input type="text" id="lastName" name="lastName" required><br><br>
+
+            <label for="phone">Phone:</label>
+            <input type="text" id="phone" name="phone" required><br><br>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required><br><br>
+
+            <input type="hidden" id="userId" name="userId">
+            
+            <button type="button" id="updateBtn">Update</button>
+        </form>
+    </div>
+</div>
+<!--------------- EDIT MODAL--------------------------->
 
      <table id="myTable">
         <thead>
@@ -234,6 +260,69 @@ $conn->close();
           <?php endif; ?>
       });
     </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById("editModal");
+    const closeModal = document.querySelector(".close");
+
+    // Add event listener for all Edit buttons
+    document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const userId = this.getAttribute('data-id');  // Get user ID from data-id attribute
+
+            // Fetch user data based on user ID
+            fetch(`edit-account.php?id=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Populate the form with the fetched user details
+                    document.getElementById('firstName').value = data.firstName;
+                    document.getElementById('lastName').value = data.lastName;
+                    document.getElementById('phone').value = data.phone;
+                    document.getElementById('email').value = data.email;
+                    document.getElementById('userId').value = userId; // Set the userId in the hidden input
+
+                    // Show the modal
+                    modal.style.display = "block";
+                })
+                .catch(error => console.error('Error fetching user data:', error));
+        });
+    });
+
+    // Close the modal when the 'x' is clicked
+    closeModal.addEventListener('click', function() {
+        modal.style.display = "none";
+    });
+
+    // Close the modal when clicking outside the modal content
+    window.onclick = function(event) {
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    };
+
+    // Add event listener for the Update button
+    document.getElementById('updateBtn').addEventListener('click', function() {
+        const form = document.getElementById('editForm');
+        const formData = new FormData(form);
+
+        // Send the form data using fetch
+        fetch(form.action, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                // Redirect to the account approval page after successful update
+                window.location.href = '../admin/account-approval.php'; // Adjust as necessary
+            } else {
+                console.error('Error updating user data:', response.statusText);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+});
+</script>
 
 </body>
 </html>
