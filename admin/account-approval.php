@@ -99,6 +99,7 @@ $conn->close();
 <!-- Include DataTables JS -->
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
   <title>Accounts</title>
+
 </head>
 <body>
 
@@ -283,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('userId').value = userId; // Set the userId in the hidden input
 
                     // Show the modal
-                    modal.style.display = "block";
+                    modal.style.display = "flex";
                 })
                 .catch(error => console.error('Error fetching user data:', error));
         });

@@ -79,8 +79,9 @@ tr:nth-child(even) {
 }
 
 .modal {
-  display: none;
+  display: none; /* Ensure modal is hidden initially */
   position: fixed;
+  z-index: 1000;
   top: 0;
   left: 0;
   width: 100%;
@@ -88,7 +89,6 @@ tr:nth-child(even) {
   background: rgba(0, 0, 0, 0.5);
   align-items: center;
   justify-content: center;
-  z-index: 1000;
 }
 
 .modal-content {
