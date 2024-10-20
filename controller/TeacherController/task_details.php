@@ -39,6 +39,38 @@ $answerResult = $answerStmt->get_result();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../../asset/css/account-approval.css">
     <title>Student Answers for <?= htmlspecialchars($taskTitle) ?></title>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        #errorMessage {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
 
@@ -60,7 +92,6 @@ $answerResult = $answerStmt->get_result();
                     <tr>
                         <td><?= htmlspecialchars($answer['firstName'] . ' ' . $answer['lastName']) ?></td>
                         <td>
-                            <!-- Display the student's answer (either text or image) -->
                             <?php if (!empty($answer['image_path'])): ?>
                                 <img src="../../uploads/answer/<?= htmlspecialchars($answer['image_path']) ?>" alt="Submitted Image" style="max-width: 200px; height: auto;">
                             <?php elseif (!empty($answer['text_answer'])): ?>
@@ -70,24 +101,16 @@ $answerResult = $answerStmt->get_result();
                             <?php endif; ?>
                         </td>
                         <td>
-                            <!-- Display existing feedback -->
-                            <?php if (!empty($answer['feedback'])): ?>
-                                <?= htmlspecialchars($answer['feedback']) ?>
-                            <?php else: ?>
-                                No feedback yet.
-                            <?php endif; ?>
+                            <div id="feedback_display_<?= htmlspecialchars($answer['id']) ?>">
+                                <?php if (!empty($answer['feedback'])): ?>
+                                    <?= htmlspecialchars($answer['feedback']) ?>
+                                <?php else: ?>
+                                    No feedback yet.
+                                <?php endif; ?>
+                            </div>
                         </td>
                         <td>
-                            <!-- Form to provide feedback -->
-                            <form method="post" action="submit_feedback.php">
-                                <input type="hidden" name="task_id" value="<?= htmlspecialchars($taskId) ?>">
-                                <input type="hidden" name="student_id" value="<?= htmlspecialchars($answer['student_id']) ?>">
-                                
-                                <label for="feedback_<?= htmlspecialchars($answer['id']) ?>">Feedback:</label>
-                                <input type="text" name="feedback" id="feedback_<?= htmlspecialchars($answer['id']) ?>" value="<?= htmlspecialchars($answer['feedback']) ?>">
-                                
-                                <button type="submit" class="button">Submit Feedback</button>
-                            </form>
+                            <button onclick="openFeedbackModal(<?= htmlspecialchars($answer['id']) ?>, <?= htmlspecialchars($taskId) ?>, <?= htmlspecialchars($answer['student_id']) ?>)" class="button">Submit Feedback</button>
                         </td>
                     </tr>
                 <?php endwhile; ?>
@@ -100,12 +123,101 @@ $answerResult = $answerStmt->get_result();
     </table>
 </div>
 
+<!-- Feedback Modal -->
+<div id="feedbackModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeFeedbackModal()">&times;</span>
+        <h2>Submit Feedback</h2>
+        <form id="feedbackForm" method="post">
+            <input type="hidden" id="modal_task_id" name="task_id">
+            <input type="hidden" id="modal_student_id" name="student_id">
+            <input type="hidden" id="modal_answer_id" name="answer_id">
+            
+            <label for="modal_feedback">Feedback:</label>
+            <textarea id="modal_feedback" name="feedback" rows="4" cols="50" required></textarea>
+            
+            <button type="submit" class="button">Submit Feedback</button>
+        </form>
+        <div id="errorMessage"></div>
+    </div>
+</div>
+
+<script>
+    function openFeedbackModal(answerId, taskId, studentId) {
+        document.getElementById('feedbackModal').style.display = 'block';
+        document.getElementById('modal_task_id').value = taskId;
+        document.getElementById('modal_student_id').value = studentId;
+        document.getElementById('modal_answer_id').value = answerId;
+        document.getElementById('errorMessage').innerHTML = ''; // Clear any previous error messages
+    }
+
+    function closeFeedbackModal() {
+        document.getElementById('feedbackModal').style.display = 'none';
+    }
+
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('feedbackModal')) {
+            closeFeedbackModal();
+        }
+    }
+
+    // Handle form submission
+    document.getElementById('feedbackForm').onsubmit = function(e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+
+        fetch('submit_feedback.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update the feedback display
+                document.getElementById('feedback_display_' + formData.get('answer_id')).innerText = formData.get('feedback');
+                closeFeedbackModal();
+            } else {
+                // Display error message
+                document.getElementById('errorMessage').innerHTML = 'Error: ' + (data.message || 'An unknown error occurred');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('errorMessage').innerHTML = 'An error occurred while submitting feedback. Please try again.';
+        });
+    };
+</script>
+
+<!---- Sweet Alert ---->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Check for success message
+        <?php if (isset($_SESSION['success'])): ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '<?php echo $_SESSION['success']; ?>',
+                confirmButtonText: 'OK'
+            });
+            <?php unset($_SESSION['success']); // Clear the session variable ?>
+        <?php endif; ?>
+
+        // Check for error message
+        <?php if (isset($_SESSION['error'])): ?>
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: '<?php echo $_SESSION['error']; ?>',
+                confirmButtonText: 'Try Again'
+            });
+            <?php unset($_SESSION['error']); // Clear the session variable ?>
+        <?php endif; ?>
+    });
+</script>
+
+
 </body>
 </html>
-
-<?php
-// Close the statement and connection
-$taskStmt->close();
-$answerStmt->close();
-$conn->close();
-?>
