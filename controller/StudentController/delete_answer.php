@@ -10,24 +10,30 @@ if (!isset($_SESSION['userId']) || $_SESSION['userRole'] !== 'student') {
     exit();
 }
 
-// Fetch the task ID and student ID from the POST request
+// Validate if the task ID is passed through POST
+if (!isset($_POST['task_id'])) {
+    $_SESSION['error'] = "No task selected for deletion.";
+    header("Location: ../../student/task.php");
+    exit();
+}
+
 $taskId = $_POST['task_id'];
-$studentId = $_POST['student_id'];
+$studentId = $_SESSION['userId']; // Get the student ID from the session
 
 // Delete the student's answer from the taskAnswer table
 $deleteQuery = "DELETE FROM taskAnswer WHERE task_id = ? AND student_id = ?";
 $deleteStmt = $conn->prepare($deleteQuery);
 $deleteStmt->bind_param("ii", $taskId, $studentId);
 
+// Execute the delete query and check if successful
 if ($deleteStmt->execute()) {
     $_SESSION['success'] = "Answer deleted successfully.";
-    header("Location: ../../student/task.php");
 } else {
     $_SESSION['error'] = "Failed to delete the answer. Please try again.";
-    header("Location: ../../student/task.php");
 }
 
-// Redirect back to the view page
+// Close the statement and redirect back to the task page
+$deleteStmt->close();
 header("Location: ../../student/task.php");
 exit();
 ?>
