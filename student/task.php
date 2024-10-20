@@ -181,7 +181,7 @@ $conn->close();
                             <form method="post" action="../controller/StudentController/delete_answer.php" style="display:inline;">
                                 <input type="hidden" name="task_id" value="<?= htmlspecialchars($task['id']) ?>">
                                 <input type="hidden" name="student_id" value="<?= htmlspecialchars($userId) ?>"> <!-- Student ID from session -->
-                                <button type="submit" class="button delete-btn">Delete</button>
+                                <button type="submit" class="button delete-btn" style="background-color: red;">Delete</button>
                             </form>
                         <?php else: ?>
                             No answer to delete.

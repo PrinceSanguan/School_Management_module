@@ -15,6 +15,16 @@ if (isset($_POST['id'], $_POST['action'])) {
     // Determine the new status
     $newStatus = $action === 'publish' ? 'publish' : 'unpublish';
     
+    // First, get the subject_id associated with this module
+    $subjectQuery = "SELECT subject_id FROM subject_images WHERE id = ?";
+    $stmtSubject = $conn->prepare($subjectQuery);
+    $stmtSubject->bind_param("i", $id);
+    $stmtSubject->execute();
+    $resultSubject = $stmtSubject->get_result();
+    $subjectData = $resultSubject->fetch_assoc();
+    $subjectId = $subjectData['subject_id'];
+    $stmtSubject->close();
+
     // Update query using the subject_images.id
     $query = "UPDATE subject_images
               SET status = ?
@@ -25,7 +35,8 @@ if (isset($_POST['id'], $_POST['action'])) {
     
     if ($stmt->execute()) {
         $_SESSION['success'] = 'Status is updated!';
-        header("Location: ../../teacher/assign_subject.php");
+        header("Location: ../../teacher/subject_modules.php?subject_id=" . $subjectId);
+        exit();
     } else {
         echo "Error updating status.";
     }
