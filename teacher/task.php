@@ -58,7 +58,6 @@ if ($result->num_rows > 0) {
 
 $stmt->close();
 
-
 // NEW LOGIC STARTS HERE
 
 // Query to fetch tasks related to the subjects
@@ -81,10 +80,27 @@ $stmtTasks->execute();
 $resultTasks = $stmtTasks->get_result();
 
 $tasks = []; // Initialize an array to store the fetched tasks
+$currentDate = date("Y-m-d"); // Get the current date
 
 if ($resultTasks->num_rows > 0) {
     // Fetching results
     while ($rowTask = $resultTasks->fetch_assoc()) {
+        // Check if the deadline equals the current date
+        if ($rowTask['deadline'] < $currentDate) {
+            // Set the task status to inactive in the array
+            $rowTask['status'] = 'inactive';
+
+            // Update the task status in the database
+            $updateQuery = "UPDATE task SET status = 'inactive' WHERE id = ?";
+            $stmtUpdate = $conn->prepare($updateQuery);
+            if ($stmtUpdate) {
+                $stmtUpdate->bind_param("i", $rowTask['id']);
+                $stmtUpdate->execute();
+                $stmtUpdate->close();
+            } else {
+                $_SESSION['error'] = "Error updating task status: " . $conn->error;
+            }
+        }
         $tasks[] = $rowTask; // Store each task row
     }
 } else {
@@ -174,7 +190,6 @@ $conn->close();
     </tbody>
 </table>
 
-</div>
 
 <!---------------ADD TASK---------------------------->
 <div class="modal" id="accountModal">
