@@ -4,10 +4,24 @@ include "../../database/database.php"; // Adjust the path if necessary
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Debugging: Check if subject_id is coming from POST data
+    if (!isset($_POST['subject_id'])) {
+        $_SESSION['error'] = "Subject ID not set in POST data.";
+        header("Location: ../../teacher/assign_subject.php");
+        exit();
+    }
+
     // Get the common POST data
     $subject_id = isset($_POST['subject_id']) ? intval($_POST['subject_id']) : null;
     $week = isset($_POST['week']) ? $_POST['week'] : null;
     $postType = isset($_POST['postType']) ? $_POST['postType'] : null;
+
+    // Debugging: Ensure $subject_id has a value after assignment
+    if (!$subject_id) {
+        $_SESSION['error'] = "Subject ID is invalid or not provided.";
+        header("Location: ../../teacher/assign_subject.php");
+        exit();
+    }
 
     // Set default values for image_url and youtube_url as spaces
     $image_url = " ";
@@ -62,17 +76,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->close();
             $_SESSION['success'] = "Module added successfully.";
         } else {
-            $_SESSION['error'] = "Database error.";
+            $_SESSION['error'] = "Database error: " . $conn->error;
         }
     } else {
-        $_SESSION['error'] = "Invalid submission.";
+        $_SESSION['error'] = "Invalid submission: missing subject ID or week.";
     }
 
     $conn->close();
-    header("Location: ../../teacher/assign_subject.php"); // Redirect to the page with the form
+
+    // Redirect with subject_id only if it's valid
+    if ($subject_id) {
+        header("Location: ../../teacher/subject_modules.php?subject_id=" . $subject_id); // Redirect to the page with the form
+    } else {
+        header("Location: ../../teacher/assign_subject.php"); // Redirect back to the form on error
+    }
     exit();
 } else {
     // Redirect if not a POST request
-    header("Location: ../../teacher/assign_subject.php");
+    header("Location: ../../teacher/subject_modules.php?subject_id=" . (isset($subject_id) ? $subject_id : ''));
     exit();
 }

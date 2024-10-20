@@ -17,7 +17,7 @@ if (!isset($_GET['subject_id'])) {
 $subjectId = $_GET['subject_id'];
 
 // Query to get modules for the specific subject
-$query = "SELECT subject.subject, subject_images.id, subject_images.week, subject_images.image_url, 
+$query = "SELECT subject.subject, subject_images.subject_id, subject_images.id, subject_images.week, subject_images.image_url, 
           subject_images.youtube_url, subject_images.status
           FROM subject
           JOIN subject_images ON subject.id = subject_images.subject_id
@@ -77,6 +77,17 @@ $conn->close();
 
     <div class="container">
         <h2>Modules for <?= htmlspecialchars($subjectName) ?></h2>
+        
+        <!-- Add Module button moved outside the loop -->
+        <button 
+            style="background-color:#28a745; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px; margin-bottom: 20px;" 
+            class="openModalBtn"
+            data-subject-id="<?= htmlspecialchars($subjectId) ?>"
+            data-subject-name="<?= htmlspecialchars($subjectName) ?>"
+        >
+            Add Module
+        </button>
+
         <?php if (!empty($modules)): ?>
             <?php foreach ($modules as $module): ?>
                 <div class="module">
@@ -99,14 +110,12 @@ $conn->close();
                                 <button type="submit" style="background-color:#28a745; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;">Publish</button>
                             <?php endif; ?>
                         </form>
-                        <button 
-                            style="background-color:#28a745; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;" 
-                            class="openModalBtn"
-                            data-subject-id="<?= htmlspecialchars($subjectId) ?>"
-                            data-subject-name="<?= htmlspecialchars($subjectName) ?>"
-                        >
-                            Add Module
-                        </button>
+                        <form method="POST" action="../controller/TeacherController/delete_module.php" style="display: inline;">
+                            <input type="hidden" name="id" value="<?= htmlspecialchars($module['id']) ?>">
+                            <input type="hidden" name="subject_id" value="<?= htmlspecialchars($module['subject_id']) ?>">
+                            <input type="hidden" name="image_url" value="<?= htmlspecialchars($module['image_url']) ?>">
+                            <button type="submit" style="background-color:#dc3545; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px;">Delete</button>
+                        </form>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -124,7 +133,7 @@ $conn->close();
     <form method="post" action="../controller/TeacherController/add_module.php" enctype="multipart/form-data">
       <!-- This will be populated with the subject name dynamically -->
       <label>Subject</label>
-      <input type="text" id="modalSubjectName" value="subject_name" readonly>
+      <input type="hidden" id="modalSubjectName" value="subject_name" readonly>
 
       <!-- Hidden input to store the subject ID -->
       <input type="hidden" id="modalSubjectId" name="subject_id">
