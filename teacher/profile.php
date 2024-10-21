@@ -101,9 +101,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="navbar">
       <a href="../teacher/announcement.php">Announcement</a>
-      <a href="../teacher/assign_subject.php" style="color: wheat;">Subject</a>
+      <a href="../teacher/assign_subject.php">Subject</a>
       <a href="../teacher/task.php">Task</a>
       <a href="../teacher/profile.php" style="color: wheat;">Profile</a>
+      <a href="../teacher/monitoring.php">Monitoring</a>
       <a href="../controller/LogoutController/logOut.php">Logout</a>
     </div>
 

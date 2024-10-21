@@ -72,6 +72,7 @@ $conn->close();
         <a href="../teacher/assign_subject.php">Subject</a>
         <a href="../teacher/task.php">Task</a>
         <a href="../teacher/profile.php">Profile</a>
+        <a href="../teacher/monitoring.php">Monitoring</a>
         <a href="../controller/LogoutController/logOut.php">Logout</a>
     </div>
 

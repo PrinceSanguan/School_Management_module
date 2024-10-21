@@ -55,6 +55,25 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../asset/css/account-approval.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>   
+    <script>
+        function updateProgress(subjectId, week) {
+            $.ajax({
+                url: 'update_progress.php',
+                type: 'POST',
+                data: {
+                    subject_id: subjectId,
+                    week: week
+                },
+                success: function(response) {
+                    console.log(response);
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }
+    </script>
     <title><?= htmlspecialchars($subject['subject']) ?> - Modules</title>
     <style>
         .container {
@@ -106,7 +125,7 @@ $conn->close();
                         <td><?= htmlspecialchars($module['week']) ?></td>
                         <td>
                         <?php if (!empty($module['image_url'])): ?>
-                          <p><a href="<?= htmlspecialchars($module['image_url']) ?>" target="_blank">View PDF</a></p>
+                            <p><a href="<?= htmlspecialchars($module['image_url']) ?>" target="_blank" onclick="updateProgress(<?= $subjectId ?>, '<?= $module['week'] ?>'); return true;">View PDF</a></p>
                         <?php endif; ?>
                         <?php if (!empty($module['youtube_url'])): ?>
                             <div><?= $module['youtube_url'] ?></div>
@@ -114,7 +133,7 @@ $conn->close();
                         </td>
                     </tr>
                 <?php endwhile; ?>
-                <?php else: ?>
+            <?php else: ?>
                 <tr>
                     <td colspan="2">No modules found for this subject.</td>
                 </tr>
@@ -122,6 +141,7 @@ $conn->close();
         </tbody>
     </table>
 </div>
+
 </body>
 </html>
 
