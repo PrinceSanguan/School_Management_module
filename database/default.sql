@@ -42,6 +42,14 @@ CREATE TABLE studentLrn (
 INSERT INTO users (firstName, lastName, email, phone, password, userRole, changePassword)
 VALUES ('admin', 'admin', 'admin@gmail.com', '09123456789', '$2y$12$8qGbpTMe/NFXUMNZbMB5Gu0SFlp/hOcbGb6yyhSdn6MxedBmK7Eta', 'admin', 'yes');
 
+-- Insert the student user
+INSERT INTO users (firstName, lastName, email, phone, password, userRole, changePassword)
+VALUES ('John', 'Doe', 'student@gmail.com', '09876543210', '$2y$12$8qGbpTMe/NFXUMNZbMB5Gu0SFlp/hOcbGb6yyhSdn6MxedBmK7Eta', 'student', 'yes');
+
+-- Insert the teacher user
+INSERT INTO users (firstName, lastName, email, phone, password, userRole, changePassword)
+VALUES ('Jose', 'Rizal', 'teacher@gmail.com', '09876543210', '$2y$12$8qGbpTMe/NFXUMNZbMB5Gu0SFlp/hOcbGb6yyhSdn6MxedBmK7Eta', 'teacher', 'yes');
+
 -- Subject table: stores subjects taught within a section
 CREATE TABLE subject (
     id INT AUTO_INCREMENT PRIMARY KEY,
