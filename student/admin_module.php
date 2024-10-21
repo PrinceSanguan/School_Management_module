@@ -51,8 +51,25 @@ $subjectStmt->bind_param("i", $userId);
 $subjectStmt->execute();
 $subjectResult = $subjectStmt->get_result();
 
+// Fetch the progress for the user
+$progressQuery = "SELECT progress AS numUserProgress FROM users WHERE id = ? AND progress IS NOT NULL";
+$progressStmt = $conn->prepare($progressQuery);
+$progressStmt->bind_param("i", $userId);
+$progressStmt->execute();
+$progressResult = $progressStmt->get_result();
+$numUserProgress = $progressResult->fetch_assoc()['numUserProgress'];
+
+// Fetch the total number of images in subject_images
+$imageQuery = "SELECT COUNT(image_url) AS numTotalImages FROM subject_images";
+$imageResult = $conn->query($imageQuery);
+$numTotalImages = $imageResult->fetch_assoc()['numTotalImages'];
+
+// Calculate the progress percentage
+$progressPercentage = ($numTotalImages > 0) ? ($numUserProgress / $numTotalImages) * 100 : 0;
+
 $sectionStmt->close();
 $subjectStmt->close();
+$progressStmt->close();
 $conn->close();
 ?>
 
@@ -99,6 +116,30 @@ $conn->close();
             font-size: 18px;
             font-weight: bold;
         }
+        .progress-bar-container {
+            width: 100%;
+            background-color: #f3f3f3;
+            border-radius: 5px;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 20px;
+            width: <?= htmlspecialchars($progressPercentage) ?>%;
+            background-color: #4caf50;
+            border-radius: 5px;
+            transition: width 0.5s;
+        }
+
+        .progress-text {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            top: 0;
+            line-height: 20px;
+            color: #000;
+        }
     </style>
 </head>
 <body>
@@ -113,6 +154,30 @@ $conn->close();
 <h2>Click the subject to view its modules</h2>
 
 <div class="container">
+    <div class="progress-bar-container">
+        <div class="progress-bar"></div>
+        <div class="progress-text">
+            <?php
+            $messages = [
+                '0% - You\'re just getting started! Every great journey begins with a single step. Keep going!',
+                '10% - You\'re making progress! Keep up the momentum.',
+                '20% - Great Job! You\'re well on your way.',
+                '30% - You\'re doing amazing! Stay focused.',
+                '40% - Halfway there! You’ve come so far.',
+                '50% - Fantastic progress! The effort will pay off.',
+                '60% - You’re in the home stretch! Stay strong.',
+                '70% - Almost there! Your dedication is inspiring.',
+                '80% - You’re so close! Keep pushing forward.',
+                '90% - You’re so close! Keep pushing forward.',
+                '100% - Congratulations! You’ve made it!'
+            ];
+
+            // Display corresponding message based on progress percentage
+            echo $messages[floor($progressPercentage / 10)];
+            ?>
+        </div>
+    </div>
+
     <div class="subject-list">
         <?php if ($subjectResult->num_rows > 0): ?>
             <?php while ($subject = $subjectResult->fetch_assoc()): ?>
