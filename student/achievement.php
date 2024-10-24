@@ -160,6 +160,7 @@ $conn->close();
     <a href="../student/profile.php">Profile</a>
     <a href="../student/achievement.php" style="color: wheat;">Achievement</a>
     <a href="../controller/LogoutController/logOut.php">Logout</a>
+    <div class="burger">&#9776;</div>
 </div>
 
 <div class="achievement-container">
@@ -201,6 +202,17 @@ $conn->close();
         <?php endforeach; ?>
     </div>
 </div>
+
+<script>
+
+// Toggle burger menu visibility
+const burger = document.querySelector('.burger');
+    const navbar = document.querySelector('.navbar');
+    burger.addEventListener('click', function () {
+        navbar.classList.toggle('active');
+    });
+
+</script>
 
 </body>
 </html>

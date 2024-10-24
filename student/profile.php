@@ -106,6 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <a href="../student/profile.php" style="color: wheat;">Profile</a>
         <a href="../student/achievement.php">Achievement</a>
         <a href="../controller/LogoutController/logOut.php">Logout</a>
+        <div class="burger">&#9776;</div>
     </div>
 
     <div class="container">
@@ -133,6 +134,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+
+    // Toggle burger menu visibility
+    const burger = document.querySelector('.burger');
+        const navbar = document.querySelector('.navbar');
+        burger.addEventListener('click', function () {
+            navbar.classList.toggle('active');
+        });
+
       // Check for success message
       <?php if (isset($_SESSION['success'])): ?>
           Swal.fire({

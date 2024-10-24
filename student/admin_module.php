@@ -150,6 +150,7 @@ $conn->close();
     <a href="../student/profile.php">Profile</a>
     <a href="../student/achievement.php">Achievement</a>
     <a href="../controller/LogoutController/logOut.php">Logout</a>
+    <div class="burger">&#9776;</div>
 </div>
 
 <h2>Click the subject to view its modules</h2>
@@ -193,5 +194,13 @@ $conn->close();
         <?php endif; ?>
     </div>
 </div>
+<script>
+    // Toggle burger menu visibility
+    const burger = document.querySelector('.burger');
+        const navbar = document.querySelector('.navbar');
+        burger.addEventListener('click', function () {
+            navbar.classList.toggle('active');
+        });
+</script>
 </body>
 </html>
