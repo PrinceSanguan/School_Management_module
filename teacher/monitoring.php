@@ -55,6 +55,7 @@ $subjectResult = $conn->query($subjectQuery);
         <a href="../teacher/profile.php">Profile</a>
         <a href="../teacher/monitoring.php" style="color: wheat;">Monitoring</a>
         <a href="../controller/LogoutController/logOut.php">Logout</a>
+        <div class="burger">&#9776;</div>
     </div>
 
     <div class="container">
@@ -108,6 +109,15 @@ $subjectResult = $conn->query($subjectQuery);
                         });
                 });
             });
+        });
+    </script>
+
+    <script>
+        // Toggle burger menu visibility
+        const burger = document.querySelector('.burger');
+        const navbar = document.querySelector('.navbar');
+        burger.addEventListener('click', function () {
+            navbar.classList.toggle('active');
         });
     </script>
 </body>

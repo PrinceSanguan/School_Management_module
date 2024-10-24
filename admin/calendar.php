@@ -28,144 +28,225 @@ if ($_SESSION['userRole'] !== 'admin' && $_SESSION['userId'] != $subject['userId
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Calendar</title>
     <style>
-/* General styling */
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #121212;
-    color: #f0f0f0;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
+        /* General styling */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #121212;
+            color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
 
-.container {
-    max-width: 1000px;
-    width: 90%;
-    margin: auto;
-    background: #1a1a1a;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5);
-}
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            margin: auto;
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5);
+        }
 
-.calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
 
-#prevMonth, #nextMonth {
-    background-color: #2e2e2e;
-    border: none;
-    color: #fff;
-    font-size: 1.2em;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        #prevMonth, #nextMonth {
+            background-color: #2e2e2e;
+            border: none;
+            color: #fff;
+            font-size: 1.2em;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-#prevMonth:hover, #nextMonth:hover {
-    background-color: #00bcd4;
-}
+        #prevMonth:hover, #nextMonth:hover {
+            background-color: #00bcd4;
+        }
 
-#monthYear {
-    font-size: 1.8em;
-    font-weight: bold;
-    color: #00bcd4;
-}
+        #monthYear {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #00bcd4;
+        }
 
-#calendar {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
-}
+        #calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
 
-.header {
-    font-weight: bold;
-    text-align: center;
-    padding: 10px 0;
-    background: #2a2a2a;
-    color: #00bcd4;
-    border-radius: 5px;
-}
+        .header {
+            font-weight: bold;
+            text-align: center;
+            padding: 10px 0;
+            background: #2a2a2a;
+            color: #00bcd4;
+            border-radius: 5px;
+        }
 
-.day {
-    background: #2e2e2e;
-    padding: 15px;
-    border-radius: 5px;
-    position: relative;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-}
+        .day {
+            background: #2e2e2e;
+            padding: 15px;
+            border-radius: 5px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            min-height: 60px;
+        }
 
-.day:hover {
-    transform: scale(1.05);
-}
+        .day:hover {
+            transform: scale(1.05);
+        }
 
-.event {
-    background: #ff4081;
-    color: #fff;
-    padding: 5px;
-    border-radius: 3px;
-    margin-top: 5px;
-    font-size: 0.8em;
-    cursor: grab;
-}
+        .event {
+            background: #ff4081;
+            color: #fff;
+            padding: 5px;
+            border-radius: 3px;
+            margin-top: 5px;
+            font-size: 0.8em;
+            cursor: grab;
+            word-break: break-word;
+        }
 
-#eventForm {
-    background: #2e2e2e;
-    padding: 20px;
-    border-radius: 10px;
-    margin-top: 20px;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
-}
+        #eventForm {
+            background: #2e2e2e;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
+        }
 
-#eventForm.hidden {
-    display: none;
-}
+        #eventForm.hidden {
+            display: none;
+        }
 
-#eventForm h2 {
-    color: #00bcd4;
-    margin-bottom: 10px;
-}
+        #eventForm h2 {
+            color: #00bcd4;
+            margin-bottom: 10px;
+        }
 
-#eventForm input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    background: #3e3e3e;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-}
+        #eventForm input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #3e3e3e;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
 
-#saveEvent, #deleteEvent {
-    padding: 10px;
-    width: 100%;
-    background-color: #00bcd4;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
+        #saveEvent, #deleteEvent {
+            padding: 10px;
+            width: 100%;
+            background-color: #00bcd4;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+            margin-bottom: 10px;
+        }
 
-#saveEvent:hover, #deleteEvent:hover {
-    background-color: #0097a7;
-}
+        #saveEvent:hover, #deleteEvent:hover {
+            background-color: #0097a7;
+        }
 
-#deleteEvent {
-    background-color: #f44336;
-}
+        #deleteEvent {
+            background-color: #f44336;
+        }
 
-#deleteEvent.hidden {
-    display: none;
-}
+        #deleteEvent.hidden {
+            display: none;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+
+            #monthYear {
+                font-size: 1.4em;
+            }
+
+            .header {
+                font-size: 0.9em;
+                padding: 5px;
+            }
+
+            .day {
+                padding: 10px;
+                min-height: 50px;
+                font-size: 0.9em;
+            }
+
+            .event {
+                font-size: 0.7em;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .calendar-header {
+                justify-content: center;
+            }
+
+            #monthYear {
+                font-size: 1.2em;
+                order: 2;
+                width: 100%;
+                text-align: center;
+                margin: 10px 0;
+            }
+
+            #prevMonth {
+                order: 1;
+            }
+
+            #nextMonth {
+                order: 3;
+            }
+
+            #calendar {
+                gap: 5px;
+            }
+
+            .header {
+                font-size: 0.8em;
+                padding: 3px;
+            }
+
+            .day {
+                padding: 5px;
+                min-height: 40px;
+                font-size: 0.8em;
+            }
+
+            #eventForm {
+                padding: 15px;
+            }
+
+            #eventForm h2 {
+                font-size: 1.2em;
+            }
+        }
     </style>
 </head>
 <body>
@@ -176,7 +257,7 @@ body {
             <button id="nextMonth">&gt;</button>
         </div>
         <div id="calendar"></div>
-        <div id="eventForm" class="hiden">
+        <div id="eventForm" class="hidden">
             <h2>Add/Edit Event</h2>
             <input type="date" id="eventDate" />
             <input type="text" id="eventTitle" placeholder="Event Title" />

@@ -128,6 +128,7 @@ $conn->close();
         <a href="../teacher/profile.php">Profile</a>
         <a href="../teacher/monitoring.php">Monitoring</a>
         <a href="../controller/LogoutController/logOut.php">Logout</a>
+        <div class="burger">&#9776;</div>
     </div>
 
     <div class="container">
@@ -269,6 +270,14 @@ $conn->close();
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+
+    // Toggle burger menu visibility
+    const burger = document.querySelector('.burger');
+    const navbar = document.querySelector('.navbar');
+        burger.addEventListener('click', function () {
+            navbar.classList.toggle('active');
+        });
+
       // Check for success message
       <?php if (isset($_SESSION['success'])): ?>
           Swal.fire({

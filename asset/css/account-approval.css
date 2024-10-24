@@ -44,6 +44,7 @@ table {
   margin-bottom: 2rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   background: #fff;
+  overflow-x: auto; /* Ensures table is scrollable on small screens */
 }
 
 th,
@@ -137,5 +138,36 @@ tr:nth-child(even) {
   .navbar {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  /* Responsive Table */
+  table {
+    display: block;
+    overflow-x: auto; /* Enable horizontal scrolling */
+  }
+
+  th,
+  td {
+    white-space: nowrap; /* Prevent table content from wrapping */
+  }
+
+  /* Responsive Modal */
+  .modal-content {
+    width: 90%; /* Make modal width responsive */
+    padding: 1rem; /* Adjust padding for small screens */
+  }
+}
+
+/* For extra small devices like phones (less than 600px) */
+@media (max-width: 600px) {
+  th,
+  td {
+    padding: 0.5rem; /* Reduce padding */
+    font-size: 0.9rem; /* Adjust font size for better fit */
+  }
+
+  .modal-content {
+    width: 85%; /* Further reduce modal width for smaller screens */
+    padding: 1rem;
   }
 }
