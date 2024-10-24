@@ -10,7 +10,8 @@ body {
   color: #fff;
   padding: 1rem;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .navbar a {
@@ -22,6 +23,13 @@ body {
 .navbar a:hover {
   background: #555;
   border-radius: 5px;
+}
+
+.burger {
+  display: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: white;
 }
 
 .container {
@@ -64,22 +72,13 @@ tr:nth-child(even) {
   font-size: 1rem;
 }
 
-.buttons {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 5px;
-  background: #df0b0b;
-  color: #fff;
-  cursor: pointer;
-  font-size: 1rem;
-}
-
 .button:hover {
   background: #218838;
 }
 
+/* Modal related styles */
 .modal {
-  display: none; /* Ensure modal is hidden initially */
+  display: none;
   position: fixed;
   z-index: 1000;
   top: 0;
@@ -100,33 +99,6 @@ tr:nth-child(even) {
   width: 100%;
 }
 
-select {
-  margin-bottom: 1rem;
-  padding: 0.75rem;
-  width: 100%;
-  border-radius: 5px;
-  border: 1px solid #ddd;
-}
-
-.modal-content input,
-.modal-content button {
-  margin-bottom: 1rem;
-  padding: 0.75rem;
-  width: 100%;
-  border-radius: 5px;
-  border: 1px solid #ddd;
-}
-
-.modal-content button {
-  background: #007bff;
-  color: #fff;
-  cursor: pointer;
-}
-
-.modal-content button:hover {
-  background: #0056b3;
-}
-
 .modal-close {
   position: absolute;
   top: 10px;
@@ -144,7 +116,26 @@ select {
   justify-content: center;
 }
 
-/* Hide the LRN field by default */
-#lrnField {
-  display: none;
+/* Responsive styles */
+@media (max-width: 768px) {
+  .navbar a {
+    display: none;
+  }
+
+  .burger {
+    display: block;
+  }
+
+  .navbar.active a {
+    display: block;
+    text-align: center;
+    padding: 1rem;
+    width: 100%;
+    background-color: #333;
+  }
+
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }

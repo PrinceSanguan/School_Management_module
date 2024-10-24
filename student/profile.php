@@ -104,6 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <a href="../student/admin_module.php">Modules</a>
         <a href="../student/task.php">Task</a>
         <a href="../student/profile.php" style="color: wheat;">Profile</a>
+        <a href="../student/achievement.php">Achievement</a>
         <a href="../controller/LogoutController/logOut.php">Logout</a>
     </div>
 

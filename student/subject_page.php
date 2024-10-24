@@ -105,7 +105,9 @@ $conn->close();
     <a href="../student/admin_module.php">Modules</a>
     <a href="../student/task.php">Task</a>
     <a href="../student/profile.php">Profile</a>
+    <a href="../student/achievement.php">Achievement</a>
     <a href="../controller/LogoutController/logOut.php">Logout</a>
+    <div class="burger">&#9776;</div>
 </div>
 
 <h2><?= htmlspecialchars($subject['subject']) ?> - Modules</h2>
@@ -125,7 +127,11 @@ $conn->close();
                         <td><?= htmlspecialchars($module['week']) ?></td>
                         <td>
                         <?php if (!empty($module['image_url'])): ?>
-                            <p><a href="<?= htmlspecialchars($module['image_url']) ?>" target="_blank" onclick="updateProgress(<?= $subjectId ?>, '<?= $module['week'] ?>'); return true;">View PDF</a></p>
+                            <?php
+                            // Extract filename from the URL
+                            $filename = basename($module['image_url']);
+                            ?>
+                            <p><a href="<?= htmlspecialchars($module['image_url']) ?>" target="_blank" onclick="updateProgress(<?= $subjectId ?>, '<?= $module['week'] ?>'); return true;"><?= htmlspecialchars($filename) ?></a></p>
                         <?php endif; ?>
                         <?php if (!empty($module['youtube_url'])): ?>
                             <div><?= $module['youtube_url'] ?></div>
@@ -142,6 +148,41 @@ $conn->close();
     </table>
 </div>
 
+<!---- Sweet Alert ---->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Toggle burger menu visibility
+        const burger = document.querySelector('.burger');
+        const navbar = document.querySelector('.navbar');
+        burger.addEventListener('click', function () {
+            navbar.classList.toggle('active');
+        });
+
+        // Check for success message
+        <?php if (isset($_SESSION['success'])): ?>
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: '<?php echo $_SESSION['success']; ?>',
+                confirmButtonText: 'OK'
+            });
+            <?php unset($_SESSION['success']); ?>
+        <?php endif; ?>
+
+        // Check for error message
+        <?php if (isset($_SESSION['error'])): ?>
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: '<?php echo $_SESSION['error']; ?>',
+                confirmButtonText: 'Try Again'
+            });
+            <?php unset($_SESSION['error']); ?>
+        <?php endif; ?>
+    });
+</script>
+
 </body>
 </html>
-

@@ -80,7 +80,9 @@ $conn->close();
     <a href="../student/admin_module.php">Modules</a>
     <a href="../student/task.php" style="color: wheat;">Task</a>
     <a href="../student/profile.php">Profile</a>
+    <a href="../student/achievement.php">Achievement</a>
     <a href="../controller/LogoutController/logOut.php">Logout</a>
+    <div class="burger">&#9776;</div>
 </div>
 
 <div class="container">
@@ -116,6 +118,13 @@ $conn->close();
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // Toggle burger menu visibility
+        const burger = document.querySelector('.burger');
+        const navbar = document.querySelector('.navbar');
+        burger.addEventListener('click', function () {
+            navbar.classList.toggle('active');
+        });
+
         // Check for success message
         <?php if (isset($_SESSION['success'])): ?>
             Swal.fire({
@@ -124,7 +133,7 @@ $conn->close();
                 text: '<?php echo $_SESSION['success']; ?>',
                 confirmButtonText: 'OK'
             });
-            <?php unset($_SESSION['success']); // Clear the session variable ?>
+            <?php unset($_SESSION['success']); ?>
         <?php endif; ?>
 
         // Check for error message
@@ -135,7 +144,7 @@ $conn->close();
                 text: '<?php echo $_SESSION['error']; ?>',
                 confirmButtonText: 'Try Again'
             });
-            <?php unset($_SESSION['error']); // Clear the session variable ?>
+            <?php unset($_SESSION['error']); ?>
         <?php endif; ?>
     });
 </script>

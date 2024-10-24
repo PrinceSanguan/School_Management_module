@@ -95,6 +95,7 @@ if ($result->num_rows > 0) {
         <a href="../student/admin_module.php">Modules</a>
         <a href="../student/task.php">Task</a>
         <a href="../student/profile.php">Profile</a>
+        <a href="../student/achievement.php">Achievement</a>
         <a href="../controller/LogoutController/logOut.php">Logout</a>
     </div>
 
