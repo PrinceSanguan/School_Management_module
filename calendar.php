@@ -6,233 +6,336 @@ require 'database/config.php';
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="asset/images/logo.webp" type="image/x-icon">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200&family=Oswald:wght@200..700&family=Poppins:wght@100;200;300;400;600;700&family=Roboto+Condensed:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-  <title>CompassED LMS</title>
-  <style>
-/* General styling */
-body {
-    font-family: 'Arial', sans-serif;
-    background-color: #121212;
-    color: #f0f0f0;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="asset/images/logo.webp" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <title>CompassED LMS</title>
+    <style>
+        :root {
+            --primary-color: #00bcd4;
+            --secondary-color: #0097a7;
+            --background-dark: #121212;
+            --surface-dark: #1a1a1a;
+            --card-dark: #2e2e2e;
+            --text-primary: #f0f0f0;
+            --text-secondary: #a0a0a0;
+            --danger-color: #f44336;
+            --transition: all 0.3s ease;
+        }
 
-.container {
-    max-width: 1000px;
-    width: 90%;
-    margin: auto;
-    background: #1a1a1a;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.5);
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-.calendar-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-#prevMonth, #nextMonth {
-    background-color: #2e2e2e;
-    border: none;
-    color: #fff;
-    font-size: 1.2em;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+        /* Navbar Styles */
+        .navbar {
+            background: var(--surface-dark);
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
 
-#prevMonth:hover, #nextMonth:hover {
-    background-color: #00bcd4;
-}
+        .nav-links {
+            display: flex;
+            justify-content: flex-end;
+            list-style: none;
+        }
 
-#monthYear {
-    font-size: 1.8em;
-    font-weight: bold;
-    color: #00bcd4;
-}
+        .menu {
+            display: flex;
+            gap: 2rem;
+        }
 
-#calendar {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
-}
+        .menu li a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
 
-.header {
-    font-weight: bold;
-    text-align: center;
-    padding: 10px 0;
-    background: #2a2a2a;
-    color: #00bcd4;
-    border-radius: 5px;
-}
+        .menu li a:hover {
+            color: var(--primary-color);
+        }
 
-.day {
-    background: #2e2e2e;
-    padding: 15px;
-    border-radius: 5px;
-    position: relative;
-    cursor: pointer;
-    transition: transform 0.3s ease;
-}
+        /* Calendar Container */
+        .container {
+            max-width: 1200px;
+            margin: 80px auto 20px;
+            background: var(--surface-dark);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
 
-.day:hover {
-    transform: scale(1.05);
-}
+        /* Calendar Header */
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 0 1rem;
+        }
 
-.event {
-    background: #ff4081;
-    color: #fff;
-    padding: 5px;
-    border-radius: 3px;
-    margin-top: 5px;
-    font-size: 0.8em;
-    cursor: grab;
-}
+        #monthYear {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
 
-#eventForm {
-    background: #2e2e2e;
-    padding: 20px;
-    border-radius: 10px;
-    margin-top: 20px;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.5);
-}
+        #prevMonth, #nextMonth {
+            background-color: var(--card-dark);
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
 
-#eventForm.hidden {
-    display: none;
-}
+        #prevMonth:hover, #nextMonth:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
 
-#eventForm h2 {
-    color: #00bcd4;
-    margin-bottom: 10px;
-}
+        /* Calendar Grid */
+        #calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 15px;
+            padding: 1rem;
+        }
 
-#eventForm input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    background: #3e3e3e;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-}
+        .header {
+            font-weight: 500;
+            text-align: center;
+            padding: 1rem;
+            background: var(--card-dark);
+            color: var(--primary-color);
+            border-radius: 8px;
+        }
 
-#saveEvent, #deleteEvent {
-    padding: 10px;
-    width: 100%;
-    background-color: #00bcd4;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
-}
+        .day {
+            background: var(--card-dark);
+            padding: 1rem;
+            border-radius: 8px;
+            min-height: 100px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
 
-#saveEvent:hover, #deleteEvent:hover {
-    background-color: #0097a7;
-}
+        .day:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
 
-#deleteEvent {
-    background-color: #f44336;
-}
+        .event {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: grab;
+            transition: var(--transition);
+        }
 
-#deleteEvent.hidden {
-    display: none;
-}
+        .event:hover {
+            background: var(--secondary-color);
+        }
 
-/* Mobile responsiveness */
-@media screen and (max-width: 768px) {
-    #calendar {
-        grid-template-columns: repeat(3, 1fr); /* Reduce columns to 3 */
-        gap: 5px;
-    }
+        /* Event Form */
+        #eventForm {
+            background: var(--card-dark);
+            padding: 2rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
 
-    #monthYear {
-        font-size: 1.5em;
-    }
+        #eventForm input {
+            width: 100%;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: var(--surface-dark);
+            color: var(--text-primary);
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
 
-    .day {
-        padding: 10px;
-    }
+        #eventForm input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
 
-    .calendar-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+        /* Buttons */
+        #saveEvent, #deleteEvent {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
 
-    #prevMonth, #nextMonth {
-        font-size: 1em;
-        padding: 8px;
-    }
+        #saveEvent {
+            background-color: var(--primary-color);
+            color: white;
+            margin-bottom: 1rem;
+        }
 
-    #prevMonth, #nextMonth {
-        width: 48%; /* Reduce button width */
-    }
-}
+        #deleteEvent {
+            background-color: var(--danger-color);
+            color: white;
+        }
 
-@media screen and (max-width: 480px) {
-    #calendar {
-        grid-template-columns: repeat(2, 1fr); /* Reduce to 2 columns */
-        gap: 5px;
-    }
+        #saveEvent:hover, #deleteEvent:hover {
+            filter: brightness(110%);
+            transform: translateY(-2px);
+        }
 
-    #monthYear {
-        font-size: 1.2em;
-    }
+        /* Mobile Responsiveness */
+        @media screen and (max-width: 1024px) {
+            .container {
+                padding: 1.5rem;
+            }
 
-    .day {
-        padding: 8px;
-        font-size: 0.8em;
-    }
+            #calendar {
+                gap: 10px;
+            }
 
-    #prevMonth, #nextMonth {
-        font-size: 0.9em;
-        padding: 6px;
-    }
+            .day {
+                min-height: 80px;
+                padding: 0.8rem;
+            }
+        }
 
-    .calendar-header {
-        flex-direction: column;
-        align-items: center;
-    }
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
 
-    #prevMonth, #nextMonth {
-        width: 45%; /* Buttons take less space on mobile */
-    }
-}
+            .container {
+                margin-top: 60px;
+                padding: 1rem;
+            }
 
+            #monthYear {
+                font-size: 1.5rem;
+            }
+
+            #calendar {
+                grid-template-columns: repeat(7, 1fr);
+                gap: 5px;
+            }
+
+            .header, .day {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            .day {
+                min-height: 60px;
+            }
+
+            .menu {
+                gap: 1rem;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .navbar {
+                padding: 0.8rem 1rem;
+            }
+
+            .calendar-header {
+                flex-direction: row;
+                gap: 0.5rem;
+            }
+
+            #monthYear {
+                font-size: 1.2rem;
+            }
+
+            #prevMonth, #nextMonth {
+                padding: 0.5rem 1rem;
+                font-size: 1.2rem;
+            }
+
+            #calendar {
+                grid-template-columns: repeat(7, 1fr);
+                gap: 3px;
+            }
+
+            .header, .day {
+                padding: 0.3rem;
+                font-size: 0.8rem;
+            }
+
+            .day {
+                min-height: 50px;
+            }
+
+            .event {
+                padding: 0.3rem;
+                font-size: 0.75rem;
+            }
+
+            .menu {
+                gap: 0.8rem;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 <body>
+    <nav class="navbar">
+        <ul class="nav-links">
+            <div class="menu">
+                <li><a href="index.php">Home</a></li>
+                <li><a href="about.php">About</a></li>
+                <li><a href="calendar.php">Calendar</a></li>
+                <li><a href="login.php">Login</a></li>
+            </div>
+        </ul>
+    </nav>
 
     <div class="container">
         <div class="calendar-header">
-            <button id="prevMonth">&lt;</button>
+            <button id="prevMonth"><i class='bx bx-chevron-left'></i></button>
             <span id="monthYear"></span>
-            <button id="nextMonth">&gt;</button>
+            <button id="nextMonth"><i class='bx bx-chevron-right'></i></button>
         </div>
         <div id="calendar"></div>
-  
-            <input type="hidden" id="eventDate" />
-            <input type="hidden" id="eventTitle" placeholder="Event Title" />
-            <input type="hidden" id="eventId" />
-            <input type="hidden" id="saveEvent" />
-            <input type="hidden" id="deleteEvent" />
-      
+
+        <input type="hidden" id="eventDate" />
+        <input type="hidden" id="eventTitle" placeholder="Event Title" />
+        <input type="hidden" id="eventId" />
+        <input type="hidden" id="saveEvent" />
+        <input type="hidden" id="deleteEvent" />
     </div>
     
     <script>
