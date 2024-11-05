@@ -71,6 +71,18 @@ $conn->close();
     </style>
 <body>
 
+<div class="navbar">
+    <a href="../../admin/account-approval.php">Accounts</a>
+    <a href="../../admin/section.php">Section</a>
+    <a href="../../admin/announcement.php">Announcement</a>
+    <a href="../../admin/registration.php">Assign Teacher</a>
+    <a href="../../admin/student-registration.php">Assign Student</a>
+    <a href="../../admin/calendar.php">Calendar</a>
+    <a href="../../admin/archive.php">Archive</a>
+    <a href="../../controller/LogoutController/logOut.php">Logout</a>
+  </div>
+  <br>
+
   <table>
     <thead>
       <tr>
@@ -78,7 +90,7 @@ $conn->close();
         <th>Action</th>
       </tr>
     </thead>
-
+<img src="../../admin/" alt="">
     <tbody>
       <?php foreach ($subjects as $subject): ?>
         <tr>
