@@ -25,6 +25,25 @@ if (empty($firstName) || empty($lastName) || empty($email) || empty($phone) || e
     exit();
 }
 
+// Check if the LRN already exists
+if ($userRole === 'student' && !empty($lrn)) {
+    $lrnCheckQuery = "SELECT id FROM studentLrn WHERE lrn = ?";
+    $lrnCheckStmt = $conn->prepare($lrnCheckQuery);
+    $lrnCheckStmt->bind_param("s", $lrn);
+    $lrnCheckStmt->execute();
+    $lrnCheckStmt->store_result();
+
+    if ($lrnCheckStmt->num_rows > 0) {
+        // LRN already exists
+        $_SESSION['error'] = 'The LRN is already taken.';
+        $lrnCheckStmt->close();
+        $conn->close();
+        header("Location: ../../admin/account-approval.php");
+        exit();
+    }
+    $lrnCheckStmt->close();
+}
+
 // Hash the password
 $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
@@ -44,7 +63,7 @@ if ($emailCheckStmt->num_rows > 0) {
     exit();
 }
 
-// Email does not exist, proceed with insertion
+// Email and LRN are unique, proceed with insertion
 $emailCheckStmt->close();
 $query = "INSERT INTO users (firstName, lastName, email, phone, userRole, password) VALUES (?, ?, ?, ?, ?, ?)";
 $stmt = $conn->prepare($query);
